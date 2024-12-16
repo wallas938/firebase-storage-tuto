@@ -109,7 +109,7 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void showUserPage(AppUser user) {
+  void showUserPage(AppUserCredential user) {
     // Navigator.push(
     //     context,
     //     MaterialPageRoute(
@@ -129,8 +129,8 @@ class _LoginPageState extends State<LoginPage> {
       UserCredential userCredential = await firebaseAuth
           .signInWithEmailAndPassword(email: email, password: password);
 
-      AppUser user =
-          AppUser(uid: userCredential.user!.uid, name: '', email: email);
+      AppUserCredential user =
+          AppUserCredential(uid: userCredential.user!.uid, name: '', email: email);
 
       showUserPage(user);
     } on FirebaseAuthException catch (e) {

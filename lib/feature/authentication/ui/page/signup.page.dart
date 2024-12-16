@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/foundation.dart';
@@ -156,7 +158,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
 
       // create user
-      AppUser user = AppUser(
+      AppUserCredential user = AppUserCredential(
         uid: userCredential.user!.uid,
         email: email,
         name: name,
@@ -176,7 +178,7 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  showUserPage(AppUser user) {
+  showUserPage(AppUserCredential user) {
     // Navigator.push(
     //     context,
     //     MaterialPageRoute(
@@ -199,6 +201,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 width: 500,
                 child: Column(
                   children: [
+                    // FIRSTNAME
                     TextField(
                       onChanged: (text) {
                         validateField('name', text);
@@ -218,6 +221,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(
                       height: 40,
                     ),
+                    // LASTNAME
                     TextField(
                       onChanged: (text) {
                         validateField('email', text);
@@ -238,6 +242,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(
                       height: 40,
                     ),
+                    // PASSWORD
                     TextField(
                       onChanged: (text) {
                         tempPassword = text;
@@ -268,6 +273,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     const SizedBox(
                       height: 40,
                     ),
+                    // CONFIRMED PASSWORD
                     TextField(
                       onChanged: (text) {
                         validateField('confirmedPassword', text);
