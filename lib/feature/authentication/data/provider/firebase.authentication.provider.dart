@@ -2,21 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
 
-
 class FirebaseAuthenticationProvider {
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  Future<AppUserCredential?> signup(String name, String email, String password) async {
+  Future<AppUser?> signup(
+      String name, String email, String password) async {
     try {
-      UserCredential userCredential = await firebaseAuth
+      UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password);
 
       if (userCredential.user != null) {
-        AppUserCredential user =
-            AppUserCredential(uid: userCredential.user!.uid, name: name, email: email);
+        AppUser user = AppUser(
+            id: userCredential.user!.uid, username: name, email: email);
 
-        await firebaseFirestore.collection("users").add(user.toJson());
+        await _firebaseFirestore.collection("users").add(user.toJson());
 
         return user;
       }
