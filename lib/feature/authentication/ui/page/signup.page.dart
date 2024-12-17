@@ -1,12 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
+import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -74,7 +72,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
             if (value.isEmpty || !regex.hasMatch(value)) {
               fieldsData[field]?.errorMessage =
-              'Entered email is not correctly formated.';
+                  'Entered email is not correctly formated.';
               fieldsData[field]?.hasError = FieldErrorState.invalid;
             } else {
               fieldsData[field]?.errorMessage = null;
@@ -89,7 +87,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
             if (value.length < 6) {
               fieldsData[field]?.errorMessage =
-              'Your password must be at least six characters long.';
+                  'Your password must be at least six characters long.';
               fieldsData[field]?.hasError = FieldErrorState.invalid;
             } else {
               fieldsData[field]?.errorMessage = null;
@@ -118,7 +116,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   bool isAllFieldsAreValid() {
     bool isValid = fieldNames.every((fieldName) =>
-    fieldsData[fieldName]!.hasError == FieldErrorState.valid);
+        fieldsData[fieldName]!.hasError == FieldErrorState.valid);
     setState(() {
       if (isValid) {
         formState = true;
@@ -143,49 +141,29 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void signup() async {
-    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
     final name = fieldsData['name']!.textEditingController.text;
     final email = fieldsData['email']!.textEditingController.text;
     final password = fieldsData['password']!.textEditingController.text;
 
-    try {
+    AppUserCredential appUserCredential = AppUserCredential(
+        uid: '', name: name, email: email, password: password);
 
-      final UserCredential userCredential =
-      await firebaseAuth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+    context
+        .read<AuthenticationBloc>()
+        .add(AuthenticationStartEvent(credential: appUserCredential));
 
-      // create user
-      AppUserCredential user = AppUserCredential(
-        uid: userCredential.user!.uid,
-        email: email,
-        name: name,
-      );
-
-      // the newly created user is stored into the firestore database in users collection
-      await firestore.collection("users").doc(user.uid).set(user.toJson());
-
-      showUserPage(user);
-    } on FirebaseAuthException catch (e) {
-      if (kDebugMode) {
-        print(e);
-        setState(() {
-          serverError = e.message!;
-        });
-      }
-    }
+    // the newly created user is stored into the firestore database in users collection
+    // await firestore.collection("users").doc(user.uid).set(user.toJson());
+    /// Send the newly created user to home page when signed up
+    showUserPage();
   }
 
-  showUserPage(AppUserCredential user) {
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //       builder: (context) => UserPage(
-    //         user: user,
-    //       ),
-    //     ));
+  showUserPage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const EventsPage(),
+        ));
   }
 
   @override
@@ -193,144 +171,155 @@ class _SignUpPageState extends State<SignUpPage> {
     final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Padding(
-          padding: EdgeInsets.only(top: screenH / 8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Center(
-              child: SizedBox(
-                width: 500,
-                child: Column(
-                  children: [
-                    // FIRSTNAME
-                    TextField(
-                      onChanged: (text) {
-                        validateField('name', text);
-                      },
-                      controller: fieldsData['name']?.textEditingController,
-                      decoration: InputDecoration(
-                          hintText: 'Enter your name',
-                          labelText: "Name",
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          errorText: !fieldsData['name']!.isFocused &&
+      padding: EdgeInsets.only(top: screenH / 8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Center(
+          child: SizedBox(
+            width: 500,
+            child: Column(
+              children: [
+                // FIRSTNAME
+                TextField(
+                  onChanged: (text) {
+                    validateField('name', text);
+                  },
+                  controller: fieldsData['name']?.textEditingController,
+                  decoration: InputDecoration(
+                      hintText: 'Enter your name',
+                      labelText: "Name",
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      errorText: !fieldsData['name']!.isFocused &&
                               fieldsData['name']!.hasError ==
                                   FieldErrorState.invalid
-                              ? fieldsData['name']?.errorMessage
-                              : null),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    // LASTNAME
-                    TextField(
-                      onChanged: (text) {
-                        validateField('email', text);
-                      },
-                      focusNode: fieldsData['email']?.focusNode,
-                      controller: fieldsData['email']?.textEditingController,
-                      decoration: InputDecoration(
-                          hintText: 'Enter an email',
-                          labelText: "Email",
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          errorText: !fieldsData['email']!.isFocused &&
+                          ? fieldsData['name']?.errorMessage
+                          : null),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                // LASTNAME
+                TextField(
+                  onChanged: (text) {
+                    validateField('email', text);
+                  },
+                  focusNode: fieldsData['email']?.focusNode,
+                  controller: fieldsData['email']?.textEditingController,
+                  decoration: InputDecoration(
+                      hintText: 'Enter an email',
+                      labelText: "Email",
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      errorText: !fieldsData['email']!.isFocused &&
                               fieldsData['email']!.hasError ==
                                   FieldErrorState.invalid
-                              ? fieldsData['email']?.errorMessage
-                              : null),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    // PASSWORD
-                    TextField(
-                      onChanged: (text) {
-                        tempPassword = text;
-                        validateField('password', text);
-                        // If confirmed password field changed at least one time
-                        if (fieldsData['confirmedPassword']!.isDirty) {
-                          validateField(
-                              'confirmedPassword',
-                              fieldsData['confirmedPassword']!
-                                  .textEditingController
-                                  .text);
-                        }
-                      },
-                      focusNode: fieldsData['password']?.focusNode,
-                      controller: fieldsData['password']?.textEditingController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          hintText: 'Enter your password',
-                          labelText: "Password",
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          errorText: !fieldsData['password']!.isFocused &&
+                          ? fieldsData['email']?.errorMessage
+                          : null),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                // PASSWORD
+                TextField(
+                  onChanged: (text) {
+                    tempPassword = text;
+                    validateField('password', text);
+                    // If confirmed password field changed at least one time
+                    if (fieldsData['confirmedPassword']!.isDirty) {
+                      validateField(
+                          'confirmedPassword',
+                          fieldsData['confirmedPassword']!
+                              .textEditingController
+                              .text);
+                    }
+                  },
+                  focusNode: fieldsData['password']?.focusNode,
+                  controller: fieldsData['password']?.textEditingController,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      hintText: 'Enter your password',
+                      labelText: "Password",
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      errorText: !fieldsData['password']!.isFocused &&
                               fieldsData['password']!.hasError ==
                                   FieldErrorState.invalid
-                              ? fieldsData['password']?.errorMessage
-                              : null),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    // CONFIRMED PASSWORD
-                    TextField(
-                      onChanged: (text) {
-                        validateField('confirmedPassword', text);
-                      },
-                      controller:
+                          ? fieldsData['password']?.errorMessage
+                          : null),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                // CONFIRMED PASSWORD
+                TextField(
+                  onChanged: (text) {
+                    validateField('confirmedPassword', text);
+                  },
+                  controller:
                       fieldsData['confirmedPassword']?.textEditingController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                          hintText: 'Repeat your password',
-                          labelText: "Confirm Password",
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                          errorText: !fieldsData['confirmedPassword']!.isFocused &&
+                  obscureText: true,
+                  decoration: InputDecoration(
+                      hintText: 'Repeat your password',
+                      labelText: "Confirm Password",
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      errorText: !fieldsData['confirmedPassword']!.isFocused &&
                               fieldsData['confirmedPassword']!.hasError ==
                                   FieldErrorState.invalid
-                              ? fieldsData['confirmedPassword']?.errorMessage
-                              : null),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    TextButton(
-                      onPressed: isAllFieldsAreValid() ? signup : null,
-                      style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                              (Set<WidgetState> states) {
-                            if (states.contains(WidgetState.disabled)) {
-                              return Colors.grey;
-                            }
-                            return Colors.blue;
-                          },
-                        ),
-                        overlayColor: WidgetStateProperty.all(Colors.transparent),
-                      ),
-                      child: const Text("Submit"),
-                    ),
-                    Visibility(
-                      visible: serverError.isNotEmpty,
-                      child: Text(serverError),
-                    ),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
-                            ),
-                          );
-                        },
-                        child: const Text("Already have an account?")),
-                  ],
+                          ? fieldsData['confirmedPassword']?.errorMessage
+                          : null),
                 ),
-              ),
+                const SizedBox(
+                  height: 40,
+                ),
+                BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                  builder: (context, state) {
+                    return Visibility(
+                      visible: state.loading,
+                      child: const CircularProgressIndicator(),
+                    );
+                  },
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                TextButton(
+                  onPressed: isAllFieldsAreValid() ? signup : null,
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return Colors.grey;
+                        }
+                        return Colors.blue;
+                      },
+                    ),
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  ),
+                  child: const Text("Submit"),
+                ),
+                Visibility(
+                  visible: serverError.isNotEmpty,
+                  child: Text(serverError),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const LoginPage(),
+                        ),
+                      );
+                    },
+                    child: const Text("Already have an account?")),
+              ],
             ),
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

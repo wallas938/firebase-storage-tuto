@@ -28,7 +28,11 @@ class MyApp extends StatelessWidget {
         RepositoryProvider(create: (context) => AuthenticationRepositoryImpl()),
       ],
       child: MultiBlocProvider(
-        providers: [BlocProvider(create: (context) => AuthenticationBloc())],
+        providers: [
+          BlocProvider(
+              create: (context) => AuthenticationBloc(
+                  context.read<AuthenticationRepositoryImpl>()))
+        ],
         child: const MaterialApp(
           debugShowCheckedModeBanner: false,
           home: AuthenticationPage(),

@@ -1,5 +1,5 @@
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
 
 abstract class AuthenticationRepository {
-  AppUser? signup(AppUserCredential credential);
+  Future<AppUserCredential?> signup(AppUserCredential credential);
 }

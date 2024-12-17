@@ -10,7 +10,7 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
-  bool isUserLogged = true;
+  bool showLoginPage = false;
 
   @override
   void initState() {
@@ -21,7 +21,7 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: !isUserLogged ? const LoginPage() : const SignUpPage(),
+      body: showLoginPage ? const LoginPage() : const SignUpPage(),
     );
   }
 }

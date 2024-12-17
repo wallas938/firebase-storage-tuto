@@ -1,53 +1,3 @@
-/// AppUserCredential Data for authentication
-library;
-
-class AppUserCredential {
-  String uid;
-  String name;
-  String email;
-  String password;
-
-  AppUserCredential({
-    required this.uid,
-    required this.name,
-    required this.email,
-    required this.password,
-  });
-
-  AppUserCredential copyWith({
-    String? id,
-    String? name,
-    String? email,
-    String? password,
-
-  }) {
-    return AppUserCredential(
-      uid: uid,
-      name: name ?? this.name,
-      email: email ?? this.email,
-      password: password ?? this.password,
-    );
-  }
-
-  factory AppUserCredential.fromJson(Map<String, dynamic> json) {
-    return AppUserCredential(
-      uid: json['uid'],
-      name: json['name'],
-      email: json['email'],
-      password: json['password'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'email': email,
-      'password': password,
-    };
-  }
-}
-
-
 /// AppUser Data is used for defining app users
 class AppUser {
   final String id;
@@ -61,7 +11,6 @@ class AppUser {
   final List<String>? eventPreferences;
   final NotificationPreferences? notificationPreferences;
   final String? role;
-  final bool? isVerified;
   final List<String>? createdEvents;
   final List<String>? attendedEvents;
   final List<String>? favorites;
@@ -85,7 +34,6 @@ class AppUser {
     this.eventPreferences,
     this.notificationPreferences,
     this.role,
-    this.isVerified,
     this.createdEvents,
     this.attendedEvents,
     this.favorites,
@@ -109,7 +57,6 @@ class AppUser {
     List<String>? eventPreferences,
     NotificationPreferences? notificationPreferences,
     String? role,
-    bool? isVerified,
     List<String>? createdEvents,
     List<String>? attendedEvents,
     List<String>? favorites,
@@ -133,7 +80,6 @@ class AppUser {
       eventPreferences: eventPreferences ?? this.eventPreferences,
       notificationPreferences: notificationPreferences ?? this.notificationPreferences,
       role: role ?? this.role,
-      isVerified: isVerified ?? this.isVerified,
       createdEvents: createdEvents ?? this.createdEvents,
       attendedEvents: attendedEvents ?? this.attendedEvents,
       favorites: favorites ?? this.favorites,
@@ -166,7 +112,6 @@ class AppUser {
         push: json['notificationPreferences']['push'],
       ) : null,
       role: json['role'],
-      isVerified: json['isVerified'],
       createdEvents: json['createdEvents'] != null ? List<String>.from(json['createdEvents']) : null,
       attendedEvents: json['attendedEvents'] != null ? List<String>.from(json['attendedEvents']) : null,
       favorites: json['favorites'] != null ? List<String>.from(json['favorites']) : null,
@@ -202,7 +147,6 @@ class AppUser {
         'push': notificationPreferences!.push,
       } : null,
       'role': role,
-      'isVerified': isVerified,
       'createdEvents': createdEvents,
       'attendedEvents': attendedEvents,
       'favorites': favorites,

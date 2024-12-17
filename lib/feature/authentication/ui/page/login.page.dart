@@ -1,9 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/wls.user.model.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
+import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
+import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -109,30 +111,30 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void showUserPage(AppUserCredential user) {
-    // Navigator.push(
-    //     context,
-    //     MaterialPageRoute(
-    //       builder: (context) => UserPage(
-    //         user: user,
-    //       ),
-    //     ));
+  showUserPage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const EventsPage(),
+        ));
   }
 
   void login() async {
-    final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-    final FirebaseFirestore firestore = FirebaseFirestore.instance;
     try {
       final String email = fieldsData['email']!.textEditingController.text;
       final String password =
           fieldsData['password']!.textEditingController.text;
-      UserCredential userCredential = await firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
 
-      AppUserCredential user =
-          AppUserCredential(uid: userCredential.user!.uid, name: '', email: email);
+      context.read<AuthenticationBloc>().add(AuthenticationStartEvent(
+          credential: AppUserCredential(
+              uid: null, name: '', email: email, password: password)));
+      // UserCredential userCredential = await firebaseAuth
+      //     .signInWithEmailAndPassword(email: email, password: password);
 
-      showUserPage(user);
+      // AppUserCredential user =
+      //     AppUserCredential(uid: userCredential.user!.uid, name: '', email: email);
+      /// Send user to home page when logged
+      showUserPage();
     } on FirebaseAuthException catch (e) {
       serverError = e.message!;
     }
@@ -189,6 +191,17 @@ class _LoginPageState extends State<LoginPage> {
               ),
               const SizedBox(
                 height: 40,
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, state) {
+                  return Visibility(
+                    visible: state.loading,
+                    child: const CircularProgressIndicator(),
+                  );
+                },
               ),
               TextButton(
                 onPressed: isAllFieldsAreValid() ? login : null,
