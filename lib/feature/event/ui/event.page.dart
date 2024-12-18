@@ -2,14 +2,14 @@ import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authent
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class EventsPage extends StatefulWidget {
-  const EventsPage({super.key});
+class EventPage extends StatefulWidget {
+  const EventPage({super.key});
 
   @override
-  State<EventsPage> createState() => _EventsPageState();
+  State<EventPage> createState() => _EventPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(

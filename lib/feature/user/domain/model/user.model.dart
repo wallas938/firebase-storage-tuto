@@ -10,7 +10,6 @@ class AppUser {
   final Coordinates? coordinates;
   final List<String>? eventPreferences;
   final NotificationPreferences? notificationPreferences;
-  final String? role;
   final List<String>? createdEvents;
   final List<String>? attendedEvents;
   final List<String>? favorites;
@@ -33,7 +32,6 @@ class AppUser {
     this.coordinates,
     this.eventPreferences,
     this.notificationPreferences,
-    this.role,
     this.createdEvents,
     this.attendedEvents,
     this.favorites,
@@ -46,6 +44,26 @@ class AppUser {
     this.language,
   });
 
+  AppUser.baseUser(
+      {required this.id, required this.email, required this.username})
+      : attendedEvents = [],
+        bio = '',
+        coordinates = null,
+        createdAt = DateTime.now(),
+        createdEvents = [],
+        eventPreferences = [],
+        favorites = [],
+        followers = 0,
+        following = 0,
+        language = 'en',
+        lastLogin = DateTime.now(),
+        location = null,
+        notificationPreferences = null,
+        phone = null,
+        points = 0,
+        profilePicture = null,
+        socialLinks = null;
+
   AppUser copyWith({
     String? email,
     String? username,
@@ -56,7 +74,6 @@ class AppUser {
     Coordinates? coordinates,
     List<String>? eventPreferences,
     NotificationPreferences? notificationPreferences,
-    String? role,
     List<String>? createdEvents,
     List<String>? attendedEvents,
     List<String>? favorites,
@@ -78,8 +95,8 @@ class AppUser {
       location: location ?? this.location,
       coordinates: coordinates ?? this.coordinates,
       eventPreferences: eventPreferences ?? this.eventPreferences,
-      notificationPreferences: notificationPreferences ?? this.notificationPreferences,
-      role: role ?? this.role,
+      notificationPreferences:
+          notificationPreferences ?? this.notificationPreferences,
       createdEvents: createdEvents ?? this.createdEvents,
       attendedEvents: attendedEvents ?? this.attendedEvents,
       favorites: favorites ?? this.favorites,
@@ -102,28 +119,43 @@ class AppUser {
       profilePicture: json['profilePicture'],
       bio: json['bio'],
       location: json['location'],
-      coordinates: json['coordinates'] != null ? Coordinates(
-        latitude: json['coordinates']['latitude'],
-        longitude: json['coordinates']['longitude'],
-      ) : null,
-      eventPreferences: json['eventPreferences'] != null ? List<String>.from(json['eventPreferences']) : null,
-      notificationPreferences: json['notificationPreferences'] != null ? NotificationPreferences(
-        email: json['notificationPreferences']['email'],
-        push: json['notificationPreferences']['push'],
-      ) : null,
-      role: json['role'],
-      createdEvents: json['createdEvents'] != null ? List<String>.from(json['createdEvents']) : null,
-      attendedEvents: json['attendedEvents'] != null ? List<String>.from(json['attendedEvents']) : null,
-      favorites: json['favorites'] != null ? List<String>.from(json['favorites']) : null,
+      coordinates: json['coordinates'] != null
+          ? Coordinates(
+              latitude: json['coordinates']['latitude'],
+              longitude: json['coordinates']['longitude'],
+            )
+          : null,
+      eventPreferences: json['eventPreferences'] != null
+          ? List<String>.from(json['eventPreferences'])
+          : null,
+      notificationPreferences: json['notificationPreferences'] != null
+          ? NotificationPreferences(
+              email: json['notificationPreferences']['email'],
+              push: json['notificationPreferences']['push'],
+            )
+          : null,
+      createdEvents: json['createdEvents'] != null
+          ? List<String>.from(json['createdEvents'])
+          : null,
+      attendedEvents: json['attendedEvents'] != null
+          ? List<String>.from(json['attendedEvents'])
+          : null,
+      favorites: json['favorites'] != null
+          ? List<String>.from(json['favorites'])
+          : null,
       points: json['points'],
       followers: json['followers'],
       following: json['following'],
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      lastLogin: json['lastLogin'] != null ? DateTime.parse(json['lastLogin']) : null,
-      socialLinks: json['socialLinks'] != null ? SocialLinks(
-        twitter: json['socialLinks']['twitter'],
-        instagram: json['socialLinks']['instagram'],
-      ) : null,
+      createdAt:
+          json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      lastLogin:
+          json['lastLogin'] != null ? DateTime.parse(json['lastLogin']) : null,
+      socialLinks: json['socialLinks'] != null
+          ? SocialLinks(
+              twitter: json['socialLinks']['twitter'],
+              instagram: json['socialLinks']['instagram'],
+            )
+          : null,
       language: json['language'],
     );
   }
@@ -137,16 +169,19 @@ class AppUser {
       'profilePicture': profilePicture,
       'bio': bio,
       'location': location,
-      'coordinates': coordinates != null ? {
-        'latitude': coordinates!.latitude,
-        'longitude': coordinates!.longitude,
-      } : null,
+      'coordinates': coordinates != null
+          ? {
+              'latitude': coordinates!.latitude,
+              'longitude': coordinates!.longitude,
+            }
+          : null,
       'eventPreferences': eventPreferences,
-      'notificationPreferences': notificationPreferences != null ? {
-        'email': notificationPreferences!.email,
-        'push': notificationPreferences!.push,
-      } : null,
-      'role': role,
+      'notificationPreferences': notificationPreferences != null
+          ? {
+              'email': notificationPreferences!.email,
+              'push': notificationPreferences!.push,
+            }
+          : null,
       'createdEvents': createdEvents,
       'attendedEvents': attendedEvents,
       'favorites': favorites,
@@ -155,10 +190,12 @@ class AppUser {
       'following': following,
       'createdAt': createdAt?.toIso8601String(),
       'lastLogin': lastLogin?.toIso8601String(),
-      'socialLinks': socialLinks != null ? {
-        'twitter': socialLinks!.twitter,
-        'instagram': socialLinks!.instagram,
-      } : null,
+      'socialLinks': socialLinks != null
+          ? {
+              'twitter': socialLinks!.twitter,
+              'instagram': socialLinks!.instagram,
+            }
+          : null,
       'language': language,
     };
   }

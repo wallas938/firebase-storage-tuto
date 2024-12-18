@@ -2,6 +2,7 @@ part of 'authentication_bloc.dart';
 
 enum AuthenticationEventType {
   authenticationInitialEvent,
+  authenticationCheckEvent,
   signupStartEvent,
   signupSucceedEvent,
   signupFailedEvent,
@@ -12,6 +13,14 @@ enum AuthenticationEventType {
 
 sealed class AuthenticationEvent extends Equatable {
   const AuthenticationEvent();
+}
+
+final class AuthenticationCheckEvent extends AuthenticationEvent {
+  const AuthenticationCheckEvent();
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [];
 }
 
 final class AuthenticationInitialEvent extends AuthenticationEvent {

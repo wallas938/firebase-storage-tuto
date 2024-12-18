@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
@@ -15,17 +14,17 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool formState = false;
-  late RegExp regex = RegExp(emailPattern);
-  List<String> fieldNames = ['email', 'password'];
-
-  final Map<String, FieldData> fieldsData = {};
   final Map<String, String?> errors = {};
+  final Map<String, FieldData> fieldsData = {};
+
+  late RegExp regex = RegExp(emailPattern);
+
+  List<String> fieldNames = ['email', 'password'];
+  bool formState = false;
   String serverError = '';
 
   @override
   void initState() {
-    // TODO: implement initState
     initFieldsData(fieldNames);
     super.initState();
   }
@@ -115,12 +114,11 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const EventsPage(),
+          builder: (context) => const EventPage(),
         ));
   }
 
   void login() async {
-
     final String email = fieldsData['email']!.textEditingController.text;
 
     final String password = fieldsData['password']!.textEditingController.text;

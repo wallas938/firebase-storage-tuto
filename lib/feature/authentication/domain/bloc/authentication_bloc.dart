@@ -68,6 +68,22 @@ class AuthenticationBloc
           lastEvent: AuthenticationEventType.signupFailedEvent));
     });
 
+    /// CHECK IF USER IS ALREADY AUTHENTICATED
+    on<AuthenticationCheckEvent>((event, emit) {
+      emit(state.copyWith(
+          lastEvent: AuthenticationEventType.authenticationCheckEvent));
+
+      AppUserCredential? appUserCredential =
+          authenticationRepository.getCurrentUser();
+
+      if (appUserCredential != null) {
+        add(LoginSucceedEvent(credential: appUserCredential));
+      } else {
+        emit(state.copyWith(
+            lastEvent: AuthenticationEventType.authenticationInitialEvent));
+      }
+    });
+
     /// LOGIN START
     on<LoginStartEvent>((event, emit) async {
       if (kDebugMode) {
@@ -109,6 +125,9 @@ class AuthenticationBloc
           exceptionMessage: null,
           isVerified: false,
           lastEvent: AuthenticationEventType.loginSucceedEvent));
+      if (kDebugMode) {
+        print("state : $state");
+      }
     });
 
     /// LOGIN FAILURE
