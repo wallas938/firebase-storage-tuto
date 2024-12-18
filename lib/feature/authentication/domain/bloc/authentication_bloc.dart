@@ -15,17 +15,20 @@ class AuthenticationBloc
 
   AuthenticationBloc(this.authenticationRepository)
       : super(const AuthenticationState.initialState()) {
-    on<AuthenticationStartEvent>((event, emit) async {
+    /// SIGNING UP START
+    on<SignupStartEvent>((event, emit) async {
       if (kDebugMode) {
-        print("AuthenticationStartEvent: $state");
+        print("SignupStartEvent");
       }
       try {
         emit(state.copyWith(loading: true));
+
         AppUserCredential? credential =
             await authenticationRepository.signup(event.credential);
         if (credential != null) {
-          add(AuthenticationSucceedEvent(credential: credential));
-          return;
+          add(SignupSucceedEvent(credential: credential));
+        } else {
+          emit(state.copyWith(loading: false));
         }
       } on FirebaseAuthException catch (e) {
         emit(state.copyWith(loading: false));
@@ -37,29 +40,85 @@ class AuthenticationBloc
             credential: e.credential,
             phoneNumber: e.phoneNumber,
             tenantId: e.tenantId);
-        add(AuthenticationFailedEvent(firebaseAuthException: error));
+        add(SignupFailedEvent(firebaseAuthException: error));
       }
     });
 
-    /// AUTHENTICATION SUCCESS
-    on<AuthenticationSucceedEvent>((event, emit) async {
+    /// SIGNING UP SUCCESS
+    on<SignupSucceedEvent>((event, emit) async {
       if (kDebugMode) {
-        print("AuthenticationSucceedEvent: $state");
+        print("SignupSucceedEvent");
       }
       emit(state.copyWith(
           name: event.credential.name,
           email: event.credential.email,
           loading: false,
           exceptionMessage: null,
-          isVerified: false));
+          isVerified: false,
+          lastEvent: AuthenticationEventType.signupSucceedEvent));
     });
 
-    /// AUTHENTICATION FAILURE
-    on<AuthenticationFailedEvent>((event, emit) async {
+    /// SIGNING UP FAILURE
+    on<SignupFailedEvent>((event, emit) async {
       if (kDebugMode) {
-        print("AuthenticationFailedEvent: $state");
+        print("SignupFailedEvent");
       }
-      emit(state.copyWith(exceptionMessage: event.firebaseAuthException));
+      emit(state.copyWith(
+          exceptionMessage: event.firebaseAuthException,
+          lastEvent: AuthenticationEventType.signupFailedEvent));
+    });
+
+    /// LOGIN START
+    on<LoginStartEvent>((event, emit) async {
+      if (kDebugMode) {
+        print("LoginStartEvent");
+      }
+      try {
+        emit(state.copyWith(loading: true));
+
+        AppUserCredential? credential =
+            await authenticationRepository.login(event.credential);
+        if (credential != null) {
+          add(LoginSucceedEvent(credential: credential));
+        } else {
+          emit(state.copyWith(loading: false));
+        }
+      } on FirebaseAuthException catch (e) {
+        emit(state.copyWith(loading: false));
+
+        FirebaseAuthException error = FirebaseAuthException(
+            code: e.code,
+            message: e.message,
+            email: e.email,
+            credential: e.credential,
+            phoneNumber: e.phoneNumber,
+            tenantId: e.tenantId);
+        add(LoginFailedEvent(firebaseAuthException: error));
+      }
+    });
+
+    /// LOGIN SUCCESS
+    on<LoginSucceedEvent>((event, emit) async {
+      if (kDebugMode) {
+        print("LoginSucceedEvent");
+      }
+      emit(state.copyWith(
+          name: 'event.credential.name',
+          email: event.credential.email,
+          loading: false,
+          exceptionMessage: null,
+          isVerified: false,
+          lastEvent: AuthenticationEventType.loginSucceedEvent));
+    });
+
+    /// LOGIN FAILURE
+    on<LoginFailedEvent>((event, emit) async {
+      if (kDebugMode) {
+        print("LoginFailedEvent");
+      }
+      emit(state.copyWith(
+          exceptionMessage: event.firebaseAuthException,
+          lastEvent: AuthenticationEventType.loginFailedEvent));
     });
   }
 }

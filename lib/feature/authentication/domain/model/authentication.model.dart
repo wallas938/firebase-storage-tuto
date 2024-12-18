@@ -11,8 +11,11 @@ class AppUserCredential {
     required this.uid,
     required this.name,
     required this.email,
-    this.password,
   });
+
+  AppUserCredential.signup({required this.name, required this.email, required this.password});
+
+  AppUserCredential.login({required this.email, required this.password});
 
   AppUserCredential copyWith({
     String? uid,
@@ -24,7 +27,6 @@ class AppUserCredential {
       uid: uid ?? this.uid,
       name: name ?? this.name,
       email: email ?? this.email,
-      password: password ?? this.password,
     );
   }
 
@@ -33,7 +35,6 @@ class AppUserCredential {
       uid: json['uid'],
       name: json['name'],
       email: json['email'],
-      password: json['password'],
     );
   }
 
@@ -41,7 +42,6 @@ class AppUserCredential {
     return {
       'name': name,
       'email': email,
-      'password': password,
     };
   }
 }

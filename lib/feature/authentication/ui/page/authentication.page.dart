@@ -10,7 +10,7 @@ class AuthenticationPage extends StatefulWidget {
 }
 
 class _AuthenticationPageState extends State<AuthenticationPage> {
-  bool showLoginPage = false;
+  bool showLoginPage = true;
 
   @override
   void initState() {

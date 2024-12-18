@@ -145,12 +145,12 @@ class _SignUpPageState extends State<SignUpPage> {
     final email = fieldsData['email']!.textEditingController.text;
     final password = fieldsData['password']!.textEditingController.text;
 
-    AppUserCredential appUserCredential = AppUserCredential(
-        uid: '', name: name, email: email, password: password);
+    AppUserCredential appUserCredential =
+        AppUserCredential.signup(name: name, email: email, password: password);
 
     context
         .read<AuthenticationBloc>()
-        .add(AuthenticationStartEvent(credential: appUserCredential));
+        .add(SignupStartEvent(credential: appUserCredential));
 
     // the newly created user is stored into the firestore database in users collection
     // await firestore.collection("users").doc(user.uid).set(user.toJson());

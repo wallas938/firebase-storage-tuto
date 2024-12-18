@@ -14,14 +14,14 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<AuthenticationBloc, AuthenticationState>(
       builder: (context, state) {
-        if (state.lastEvent is AuthenticationSucceedEvent) {
+        if (state.lastEvent == AuthenticationEventType.signupSucceedEvent ||
+            state.lastEvent == AuthenticationEventType.loginSucceedEvent) {
           return Center(
             child: Text(state.name),
           );
+        } else {
+          return Container(child: Text(state.name),);
         }
-        return Center(
-          child: Text(state.name),
-        );
       },
     );
   }

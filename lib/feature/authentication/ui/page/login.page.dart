@@ -120,24 +120,16 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() async {
-    try {
-      final String email = fieldsData['email']!.textEditingController.text;
-      final String password =
-          fieldsData['password']!.textEditingController.text;
 
-      context.read<AuthenticationBloc>().add(AuthenticationStartEvent(
-          credential: AppUserCredential(
-              uid: null, name: '', email: email, password: password)));
-      // UserCredential userCredential = await firebaseAuth
-      //     .signInWithEmailAndPassword(email: email, password: password);
+    final String email = fieldsData['email']!.textEditingController.text;
 
-      // AppUserCredential user =
-      //     AppUserCredential(uid: userCredential.user!.uid, name: '', email: email);
-      /// Send user to home page when logged
-      showUserPage();
-    } on FirebaseAuthException catch (e) {
-      serverError = e.message!;
-    }
+    final String password = fieldsData['password']!.textEditingController.text;
+
+    context.read<AuthenticationBloc>().add(LoginStartEvent(
+        credential: AppUserCredential.login(email: email, password: password)));
+
+    /// Send user to home page when logged
+    showUserPage();
   }
 
   @override
@@ -192,9 +184,6 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 40,
               ),
-              const SizedBox(
-                height: 40,
-              ),
               BlocBuilder<AuthenticationBloc, AuthenticationState>(
                 builder: (context, state) {
                   return Visibility(
@@ -202,6 +191,9 @@ class _LoginPageState extends State<LoginPage> {
                     child: const CircularProgressIndicator(),
                   );
                 },
+              ),
+              const SizedBox(
+                height: 40,
               ),
               TextButton(
                 onPressed: isAllFieldsAreValid() ? login : null,

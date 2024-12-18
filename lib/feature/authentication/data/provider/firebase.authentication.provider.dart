@@ -22,6 +22,30 @@ class FirebaseAuthenticationProvider {
       if (kDebugMode) {
         print(e.message);
         print(e.code);
+        rethrow;
+      }
+    }
+    return null;
+  }
+
+  Future<AppUserCredential?> login(String email, String password) async {
+    try {
+      UserCredential userCredential = await _firebaseAuth
+          .signInWithEmailAndPassword(email: email, password: password);
+
+      if (userCredential.user != null) {
+        // await _firebaseFirestore.collection("users").add(user.toJson());
+        return AppUserCredential(
+            uid: userCredential.user!.uid,
+            name: userCredential.user!.displayName,
+            email: email);
+      }
+      return null;
+    } on FirebaseException catch (e) {
+      if (kDebugMode) {
+        print(e.message);
+        print(e.code);
+        rethrow;
       }
     }
     return null;

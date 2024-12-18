@@ -6,7 +6,7 @@ class AuthenticationState extends Equatable {
   final bool isVerified;
   final bool loading;
   final FirebaseAuthException? exceptionMessage;
-  final AuthenticationEvent lastEvent;
+  final AuthenticationEventType lastEvent;
 
   const AuthenticationState({
     required this.name,
@@ -23,7 +23,7 @@ class AuthenticationState extends Equatable {
         isVerified = false,
         loading = false,
         exceptionMessage = null,
-        lastEvent = const AuthenticationEmptyEvent();
+        lastEvent = AuthenticationEventType.authenticationInitialEvent;
 
   AuthenticationState copyWith(
       {String? name,
@@ -31,7 +31,7 @@ class AuthenticationState extends Equatable {
       bool? isVerified,
       bool? loading,
       FirebaseAuthException? exceptionMessage,
-      AuthenticationEvent? lastEvent}) {
+      AuthenticationEventType? lastEvent}) {
     return AuthenticationState(
         name: name ?? this.name,
         email: email ?? this.email,

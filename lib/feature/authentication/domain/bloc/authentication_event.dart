@@ -1,39 +1,76 @@
 part of 'authentication_bloc.dart';
 
+enum AuthenticationEventType {
+  authenticationInitialEvent,
+  signupStartEvent,
+  signupSucceedEvent,
+  signupFailedEvent,
+  loginStartEvent,
+  loginSucceedEvent,
+  loginFailedEvent,
+}
+
 sealed class AuthenticationEvent extends Equatable {
   const AuthenticationEvent();
 }
 
- final class AuthenticationEmptyEvent extends AuthenticationEvent {
-  const AuthenticationEmptyEvent();
+final class AuthenticationInitialEvent extends AuthenticationEvent {
+  const AuthenticationInitialEvent();
 
   @override
   // TODO: implement props
   List<Object?> get props => [];
 }
 
-final class AuthenticationStartEvent extends AuthenticationEvent {
+final class SignupStartEvent extends AuthenticationEvent {
   final AppUserCredential credential;
 
-  const AuthenticationStartEvent({required this.credential});
+  const SignupStartEvent({required this.credential});
 
   @override
   List<Object> get props => [credential];
 }
 
-final class AuthenticationSucceedEvent extends AuthenticationEvent {
+final class SignupSucceedEvent extends AuthenticationEvent {
   final AppUserCredential credential;
 
-  const AuthenticationSucceedEvent({required this.credential});
+  const SignupSucceedEvent({required this.credential});
 
   @override
   List<Object> get props => [credential];
 }
 
-final class AuthenticationFailedEvent extends AuthenticationEvent {
+final class SignupFailedEvent extends AuthenticationEvent {
   final FirebaseAuthException firebaseAuthException;
 
-  const AuthenticationFailedEvent({required this.firebaseAuthException});
+  const SignupFailedEvent({required this.firebaseAuthException});
+
+  @override
+  List<Object> get props => [firebaseAuthException];
+}
+
+final class LoginStartEvent extends AuthenticationEvent {
+  final AppUserCredential credential;
+
+  const LoginStartEvent({required this.credential});
+
+  @override
+  List<Object> get props => [credential];
+}
+
+final class LoginSucceedEvent extends AuthenticationEvent {
+  final AppUserCredential credential;
+
+  const LoginSucceedEvent({required this.credential});
+
+  @override
+  List<Object> get props => [credential];
+}
+
+final class LoginFailedEvent extends AuthenticationEvent {
+  final FirebaseAuthException firebaseAuthException;
+
+  const LoginFailedEvent({required this.firebaseAuthException});
 
   @override
   List<Object> get props => [firebaseAuthException];

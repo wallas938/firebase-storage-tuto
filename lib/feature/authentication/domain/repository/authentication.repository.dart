@@ -2,4 +2,5 @@ import 'package:firebase_storage_tuto/feature/authentication/domain/model/authen
 
 abstract class AuthenticationRepository {
   Future<AppUserCredential?> signup(AppUserCredential credential);
+  Future<AppUserCredential?> login(AppUserCredential credential);
 }
