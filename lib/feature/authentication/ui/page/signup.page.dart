@@ -25,8 +25,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   void initState() {
-    super.initState();
     initFieldsData(fieldNames);
+    super.initState();
   }
 
   void initFieldsData(List<String> fields) {
@@ -112,20 +112,19 @@ class _SignUpPageState extends State<SignUpPage> {
           }
       }
     });
+    isAllFieldsAreValid();
   }
 
-  bool isAllFieldsAreValid() {
-    bool isValid = fieldNames.every((fieldName) =>
-        fieldsData[fieldName]!.hasError == FieldErrorState.valid);
+  void isAllFieldsAreValid() {
     setState(() {
+      bool isValid = fieldNames.every((fieldName) =>
+          fieldsData[fieldName]!.hasError == FieldErrorState.valid);
       if (isValid) {
         formState = true;
-        return;
+      } else {
+        formState = false;
       }
-      formState = false;
     });
-
-    return formState;
   }
 
   @override
@@ -150,19 +149,14 @@ class _SignUpPageState extends State<SignUpPage> {
 
     context
         .read<AuthenticationBloc>()
-        .add(SignupStartEvent(credential: appUserCredential));
-
-    // the newly created user is stored into the firestore database in users collection
-    // await firestore.collection("users").doc(user.uid).set(user.toJson());
-    /// Send the newly created user to home page when signed up
-    showUserPage();
+        .add(RegisterUserEvent(credential: appUserCredential));
   }
 
-  showUserPage() {
+  showEventPage(AppUserCredential credential) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const EventPage(),
+          builder: (context) => EventPage(credential: credential),
         ));
   }
 
@@ -275,29 +269,39 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(
                   builder: (context, state) {
-                    return Visibility(
-                      visible: state.loading,
-                      child: const CircularProgressIndicator(),
-                    );
+                    if (state is AuthenticationLoadingState) {
+                      return const CircularProgressIndicator();
+                    }
+                    return Container();
                   },
                 ),
                 const SizedBox(
                   height: 40,
                 ),
-                TextButton(
-                  onPressed: isAllFieldsAreValid() ? signup : null,
-                  style: ButtonStyle(
-                    foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                      (Set<WidgetState> states) {
-                        if (states.contains(WidgetState.disabled)) {
-                          return Colors.grey;
-                        }
-                        return Colors.blue;
-                      },
-                    ),
-                    overlayColor: WidgetStateProperty.all(Colors.transparent),
-                  ),
-                  child: const Text("Submit"),
+                BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                  listener: (context, state) {
+                    if (state is LoginSuccessState) {
+                      showEventPage(state.credential);
+                    }
+                  },
+                  builder: (context, state) {
+                    return TextButton(
+                      onPressed: formState ? signup : null,
+                      style: ButtonStyle(
+                        foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                          (Set<WidgetState> states) {
+                            if (states.contains(WidgetState.disabled)) {
+                              return Colors.grey;
+                            }
+                            return Colors.blue;
+                          },
+                        ),
+                        overlayColor:
+                            WidgetStateProperty.all(Colors.transparent),
+                      ),
+                      child: const Text("Submit"),
+                    );
+                  },
                 ),
                 Visibility(
                   visible: serverError.isNotEmpty,

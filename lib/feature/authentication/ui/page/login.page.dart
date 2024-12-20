@@ -73,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
 
             if (value.length < 6) {
               fieldsData[field]?.errorMessage =
-                  'Your password must be at least six characters long.';
+              'Your password must be at least six characters long.';
               fieldsData[field]?.hasError = FieldErrorState.invalid;
             } else {
               fieldsData[field]?.errorMessage = null;
@@ -82,11 +82,12 @@ class _LoginPageState extends State<LoginPage> {
           }
       }
     });
+    isAllFieldsAreValid();
   }
 
   bool isAllFieldsAreValid() {
     bool isValid = fieldNames.every((fieldName) =>
-        fieldsData[fieldName]!.hasError == FieldErrorState.valid);
+    fieldsData[fieldName]!.hasError == FieldErrorState.valid);
     setState(() {
       if (isValid) {
         formState = true;
@@ -110,11 +111,11 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  showUserPage() {
+  showEventPage(AppUserCredential credential) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const EventPage(),
+          builder: (context) => EventPage(credential: credential),
         ));
   }
 
@@ -123,111 +124,122 @@ class _LoginPageState extends State<LoginPage> {
 
     final String password = fieldsData['password']!.textEditingController.text;
 
-    context.read<AuthenticationBloc>().add(LoginStartEvent(
+    context.read<AuthenticationBloc>().add(LoginEvent(
         credential: AppUserCredential.login(email: email, password: password)));
-
-    /// Send user to home page when logged
-    showUserPage();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenH = MediaQuery.of(context).size.height;
+    final screenH = MediaQuery
+        .of(context)
+        .size
+        .height;
     return Scaffold(
         body: Padding(
-      padding: EdgeInsets.only(top: screenH / 4),
-      child: Center(
-        child: SizedBox(
-          width: 500,
-          child: Column(
-            children: [
-              TextField(
-                onChanged: (text) {
-                  validateField('email', text);
-                },
-                focusNode: fieldsData['email']?.focusNode,
-                controller: fieldsData['email']?.textEditingController,
-                decoration: InputDecoration(
-                    hintText: 'Enter an email',
-                    labelText: "Email",
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    errorText: !fieldsData['email']!.isFocused &&
+          padding: EdgeInsets.only(top: screenH / 4),
+          child: Center(
+            child: SizedBox(
+              width: 500,
+              child: Column(
+                children: [
+                  TextField(
+                    onChanged: (text) {
+                      validateField('email', text);
+                    },
+                    focusNode: fieldsData['email']?.focusNode,
+                    controller: fieldsData['email']?.textEditingController,
+                    decoration: InputDecoration(
+                        hintText: 'Enter an email',
+                        labelText: "Email",
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        errorText: !fieldsData['email']!.isFocused &&
                             fieldsData['email']!.hasError ==
                                 FieldErrorState.invalid
-                        ? fieldsData['email']?.errorMessage
-                        : null),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              TextField(
-                onChanged: (text) {
-                  validateField('password', text);
-                },
-                focusNode: fieldsData['password']?.focusNode,
-                controller: fieldsData['password']?.textEditingController,
-                obscureText: true,
-                decoration: InputDecoration(
-                    hintText: 'Enter your password',
-                    labelText: "Password",
-                    filled: true,
-                    fillColor: Colors.grey[100],
-                    errorText: !fieldsData['password']!.isFocused &&
+                            ? fieldsData['email']?.errorMessage
+                            : null),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  TextField(
+                    onChanged: (text) {
+                      validateField('password', text);
+                    },
+                    focusNode: fieldsData['password']?.focusNode,
+                    controller: fieldsData['password']?.textEditingController,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                        hintText: 'Enter your password',
+                        labelText: "Password",
+                        filled: true,
+                        fillColor: Colors.grey[100],
+                        errorText: !fieldsData['password']!.isFocused &&
                             fieldsData['password']!.hasError ==
                                 FieldErrorState.invalid
-                        ? fieldsData['password']?.errorMessage
-                        : null),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                builder: (context, state) {
-                  return Visibility(
-                    visible: state.loading,
-                    child: const CircularProgressIndicator(),
-                  );
-                },
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              TextButton(
-                onPressed: isAllFieldsAreValid() ? login : null,
-                style: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                    (Set<WidgetState> states) {
-                      if (states.contains(WidgetState.disabled)) {
-                        return Colors.grey;
-                      }
-                      return Colors.blue;
+                            ? fieldsData['password']?.errorMessage
+                            : null),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                    builder: (context, state) {
+                      return Visibility(
+                        visible: state is AuthenticationLoadingState,
+                        child: const CircularProgressIndicator(),
+                      );
                     },
                   ),
-                  overlayColor: WidgetStateProperty.all(Colors.transparent),
-                ),
-                child: const Text("Submit"),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                    listener: (context, state) {
+                      if (state is LoginSuccessState) {
+                        showEventPage(state.credential);
+                      }
+                    },
+                    builder: (context, state) {
+                      return TextButton(
+                        onPressed: formState ? login : null,
+                        style: ButtonStyle(
+                          foregroundColor: WidgetStateProperty.resolveWith<
+                              Color>(
+                                (Set<WidgetState> states) {
+                              if (states.contains(WidgetState.disabled)) {
+                                return Colors.grey;
+                              }
+                              return Colors.blue;
+                            },
+                          ),
+                          overlayColor: WidgetStateProperty.all(Colors
+                              .transparent),
+                        ),
+                        child: const Text("Submit"),
+                      );
+                    },
+                  ),
+                  Visibility(
+                    visible: serverError.isNotEmpty,
+                    child: Text(serverError),
+                  ),
+                  const SizedBox(
+                    height: 40,
+                  ),
+                  GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const SignUpPage(),
+                          ),
+                        );
+                      },
+                      child: const Text("Create an account?")),
+                ],
               ),
-              Visibility(
-                visible: serverError.isNotEmpty,
-                child: Text(serverError),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const SignUpPage(),
-                      ),
-                    );
-                  },
-                  child: const Text("Create an account?")),
-            ],
+            ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 }

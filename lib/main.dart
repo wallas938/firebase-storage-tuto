@@ -33,23 +33,23 @@ class MyApp extends StatelessWidget {
           BlocProvider(
               create: (context) => AuthenticationBloc(
                   context.read<AuthenticationRepositoryImpl>())
-                ..add(const AuthenticationCheckEvent()))
+                ..add(const CheckAuthenticationEvent()))
         ],
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, state) => MaterialApp(
             debugShowCheckedModeBanner: false,
-            home: BlocConsumer<AuthenticationBloc, AuthenticationState>(
+            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
               builder: (context, state) {
                 // unauthenticated -> auth page (login/register)
-                if (state.lastEvent ==
-                    AuthenticationEventType.authenticationInitialEvent) {
+                if (state is AuthenticationInitialState ) {
                   return const AuthenticationPage();
                 }
 
                 // authenticated -> home page
-                if (state.lastEvent ==
-                    AuthenticationEventType.loginSucceedEvent) {
-                  return const EventPage();
+                if (state is LoginSuccessState) {
+                  return EventPage(
+                    credential: state.credential,
+                  );
                 }
 
                 return const Scaffold(
@@ -58,7 +58,6 @@ class MyApp extends StatelessWidget {
                   ),
                 );
               },
-              listener: (BuildContext context, AuthenticationState state) {},
             ),
           ),
         ),
