@@ -2,12 +2,16 @@ import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authent
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  final void Function()? togglePages;
+
+  const SignUpPage({super.key, required this.togglePages});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -152,11 +156,11 @@ class _SignUpPageState extends State<SignUpPage> {
         .add(RegisterUserEvent(credential: appUserCredential));
   }
 
-  showEventPage(AppUserCredential credential) {
+  showEventPage(AppUser user) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EventPage(credential: credential),
+          builder: (context) => EventPage(user: user),
         ));
   }
 
@@ -278,10 +282,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(
                   height: 40,
                 ),
-                BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                BlocConsumer<UserBloc, UserState>(
                   listener: (context, state) {
-                    if (state is LoginSuccessState) {
-                      showEventPage(state.credential);
+                    if (state is UserCreatedState) {
+                      showEventPage(state.newUser);
                     }
                   },
                   builder: (context, state) {
@@ -311,13 +315,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   height: 40,
                 ),
                 GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => const LoginPage(),
-                        ),
-                      );
-                    },
+                    onTap: widget.togglePages!,
                     child: const Text("Already have an account?")),
               ],
             ),

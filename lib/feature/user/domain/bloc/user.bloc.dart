@@ -12,34 +12,37 @@ part 'user.state.dart';
 class UserBloc extends Bloc<UserEvent, UserState> {
   final UserRepository userRepository;
 
-  UserBloc(this.userRepository) : super(UserState.initialState()) {
+  UserBloc(this.userRepository) : super(UserInitialState()) {
     /// CREATE A NEW USER
-    on<UserCreationStartEvent>((event, emit) async {
+    on<CreateUserEvent>((event, emit) async {
       if (kDebugMode) {
-        print("UserCreationStartEvent");
+        print("CreateUserEvent");
       }
       try {
-        emit(state.copyWith(loading: true));
+        emit(UserLoadingState());
 
         AppUser? user = await userRepository.createUser(event.credential);
         if (user != null) {
-          add(UserCreationSucceedEvent(newUser: user));
-        } else {
-          emit(state.copyWith(loading: false));
+          emit(UserCreatedState(newUser: user));
         }
       } on Exception catch (error) {
-        emit(state.copyWith(loading: false));
-
-        add(UserCreationFailedEvent(exception: Exception(error)));
+        emit(UserCreationFailureState(exception: Exception(error)));
       }
     });
-
-    /// SIGNING UP SUCCESS
-    on<UserCreationSucceedEvent>((event, emit) async {
+    on<GetUserEvent>((event, emit) async {
       if (kDebugMode) {
-        print("UserCreationSucceedEvent");
+        print("CreateUserEvent");
       }
-      emit(event.newUser as UserState);
+      try {
+        emit(UserLoadingState());
+
+        AppUser? user = await userRepository.getUserById(event.id);
+        if (user != null) {
+          emit(UserFetchedState(user: user));
+        }
+      } on Exception catch (error) {
+        emit(UserCreationFailureState(exception: Exception(error)));
+      }
     });
   }
 }

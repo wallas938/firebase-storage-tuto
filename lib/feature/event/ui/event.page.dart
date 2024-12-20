@@ -1,10 +1,10 @@
-import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
 import 'package:flutter/material.dart';
 
 class EventPage extends StatefulWidget {
-  final AppUserCredential credential;
+  final AppUser user;
 
-  const EventPage({required this.credential, super.key});
+  const EventPage({required this.user, super.key});
 
   @override
   State<EventPage> createState() => _EventPageState();
@@ -13,8 +13,9 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
+    print("_EventPageState");
     return Center(
-      child: Text(widget.credential.email),
+      child: Text(widget.user.email),
     );
   }
 }

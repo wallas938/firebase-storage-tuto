@@ -3,6 +3,9 @@ import 'package:firebase_storage_tuto/feature/authentication/data/provider/fireb
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/authentication.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
+import 'package:firebase_storage_tuto/feature/user/data/provider/firebase.app.user.provider.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/repository/user.repository.implementation.dart';
 import 'package:firebase_storage_tuto/firebase_options.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +19,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   GetIt.instance.registerLazySingleton(() => FirebaseAuthenticationProvider());
+  GetIt.instance.registerLazySingleton(() => FirebaseAppUserProvider());
   runApp(const MyApp());
 }
 
@@ -27,39 +31,40 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthenticationRepositoryImpl()),
+        RepositoryProvider(create: (context) => UserRepositoryImpl()),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
               create: (context) => AuthenticationBloc(
                   context.read<AuthenticationRepositoryImpl>())
-                ..add(const CheckAuthenticationEvent()))
+                ..add(const CheckAuthenticationEvent())),
+          BlocProvider(
+              create: (context) => UserBloc(context.read<UserRepositoryImpl>()))
         ],
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-          builder: (context, state) => MaterialApp(
-            debugShowCheckedModeBanner: false,
-            home: BlocBuilder<AuthenticationBloc, AuthenticationState>(
-              builder: (context, state) {
-                // unauthenticated -> auth page (login/register)
-                if (state is AuthenticationInitialState ) {
-                  return const AuthenticationPage();
-                }
+          builder: (context, authState) => MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Scaffold(
+                body: BlocBuilder<UserBloc, UserState>(
+                  builder: (context, userState) {
+                    // authenticated -> home page
+                    if (userState is UserFetchedState) {
+                      return EventPage(
+                        user: userState.user,
+                      );
+                    }
 
-                // authenticated -> home page
-                if (state is LoginSuccessState) {
-                  return EventPage(
-                    credential: state.credential,
-                  );
-                }
-
-                return const Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              },
-            ),
-          ),
+                    // unauthenticated -> auth page (login/register)
+                    if (authState is AuthenticationInitialState) {
+                      return const AuthenticationPage();
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  },
+                ),
+              )),
         ),
       ),
     );
