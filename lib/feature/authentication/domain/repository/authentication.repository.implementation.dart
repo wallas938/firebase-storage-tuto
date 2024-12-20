@@ -19,4 +19,9 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
     return await firebaseAuthenticationProvider.login(
         credential.email, credential.password!);
   }
+
+  @override
+  AppUserCredential? getCurrentUser() {
+    return firebaseAuthenticationProvider.getCurrentUser();
+  }
 }

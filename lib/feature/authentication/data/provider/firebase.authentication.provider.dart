@@ -50,4 +50,19 @@ class FirebaseAuthenticationProvider {
     }
     return null;
   }
+
+  AppUserCredential? getCurrentUser() {
+    if (_firebaseAuth.currentUser != null) {
+      AppUserCredential user = AppUserCredential(
+          email: _firebaseAuth.currentUser!.email!,
+          name: _firebaseAuth.currentUser!.displayName,
+          uid: _firebaseAuth.currentUser!.uid);
+      return user;
+    }
+    return null;
+  }
+
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+  }
 }

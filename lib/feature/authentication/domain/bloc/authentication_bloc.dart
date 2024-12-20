@@ -14,111 +14,78 @@ class AuthenticationBloc
   final AuthenticationRepository authenticationRepository;
 
   AuthenticationBloc(this.authenticationRepository)
-      : super(const AuthenticationState.initialState()) {
-    /// SIGNING UP START
-    on<SignupStartEvent>((event, emit) async {
+      : super(AuthenticationInitialState()) {
+    /// CHECK IF USER IS ALREADY AUTHENTICATED
+    on<CheckAuthenticationEvent>(_checkUserAuthentication);
+
+    /// SIGNING UP EVENT
+    on<RegisterUserEvent>(_signup);
+
+    /// LOGIN START EVENT
+    on<LoginEvent>(_login);
+  }
+
+  _signup(event, emit) async {
+    if (kDebugMode) {
+      print("SignupStartEvent");
+    }
+    try {
+      emit(AuthenticationLoadingState());
+
+      AppUserCredential? credential =
+          await authenticationRepository.signup(event.credential);
+      if (credential != null) {
+        emit(LoginSuccessState(credential: credential));
+      }
+    } on FirebaseAuthException catch (e) {
+      FirebaseAuthException error = FirebaseAuthException(
+          code: e.code,
+          message: e.message,
+          email: e.email,
+          credential: e.credential,
+          phoneNumber: e.phoneNumber,
+          tenantId: e.tenantId);
+
+      emit(RegisterFailureState(firebaseAuthException: error));
+    }
+  }
+
+  _login(event, emit) async {
+    if (kDebugMode) {
+      print("LoginStartEvent");
+    }
+    try {
+      emit(AuthenticationLoadingState());
+
+      AppUserCredential? credential =
+          await authenticationRepository.login(event.credential);
+      if (credential != null) {
+        emit(LoginSuccessState(credential: credential));
+      }
+    } on FirebaseAuthException catch (e) {
+      FirebaseAuthException error = FirebaseAuthException(
+          code: e.code,
+          message: e.message,
+          email: e.email,
+          credential: e.credential,
+          phoneNumber: e.phoneNumber,
+          tenantId: e.tenantId);
+
+      emit(LoginFailureState(firebaseAuthException: error));
+    }
+  }
+
+  _checkUserAuthentication(event, emit) {
+    emit(AuthenticationLoadingState());
+
+    AppUserCredential? credential = authenticationRepository.getCurrentUser();
+
+    if (credential != null) {
       if (kDebugMode) {
-        print("SignupStartEvent");
+        print(credential.uid);
       }
-      try {
-        emit(state.copyWith(loading: true));
-
-        AppUserCredential? credential =
-            await authenticationRepository.signup(event.credential);
-        if (credential != null) {
-          add(SignupSucceedEvent(credential: credential));
-        } else {
-          emit(state.copyWith(loading: false));
-        }
-      } on FirebaseAuthException catch (e) {
-        emit(state.copyWith(loading: false));
-
-        FirebaseAuthException error = FirebaseAuthException(
-            code: e.code,
-            message: e.message,
-            email: e.email,
-            credential: e.credential,
-            phoneNumber: e.phoneNumber,
-            tenantId: e.tenantId);
-        add(SignupFailedEvent(firebaseAuthException: error));
-      }
-    });
-
-    /// SIGNING UP SUCCESS
-    on<SignupSucceedEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("SignupSucceedEvent");
-      }
-      emit(state.copyWith(
-          name: event.credential.name,
-          email: event.credential.email,
-          loading: false,
-          exceptionMessage: null,
-          isVerified: false,
-          lastEvent: AuthenticationEventType.signupSucceedEvent));
-    });
-
-    /// SIGNING UP FAILURE
-    on<SignupFailedEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("SignupFailedEvent");
-      }
-      emit(state.copyWith(
-          exceptionMessage: event.firebaseAuthException,
-          lastEvent: AuthenticationEventType.signupFailedEvent));
-    });
-
-    /// LOGIN START
-    on<LoginStartEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("LoginStartEvent");
-      }
-      try {
-        emit(state.copyWith(loading: true));
-
-        AppUserCredential? credential =
-            await authenticationRepository.login(event.credential);
-        if (credential != null) {
-          add(LoginSucceedEvent(credential: credential));
-        } else {
-          emit(state.copyWith(loading: false));
-        }
-      } on FirebaseAuthException catch (e) {
-        emit(state.copyWith(loading: false));
-
-        FirebaseAuthException error = FirebaseAuthException(
-            code: e.code,
-            message: e.message,
-            email: e.email,
-            credential: e.credential,
-            phoneNumber: e.phoneNumber,
-            tenantId: e.tenantId);
-        add(LoginFailedEvent(firebaseAuthException: error));
-      }
-    });
-
-    /// LOGIN SUCCESS
-    on<LoginSucceedEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("LoginSucceedEvent");
-      }
-      emit(state.copyWith(
-          name: 'event.credential.name',
-          email: event.credential.email,
-          loading: false,
-          exceptionMessage: null,
-          isVerified: false,
-          lastEvent: AuthenticationEventType.loginSucceedEvent));
-    });
-
-    /// LOGIN FAILURE
-    on<LoginFailedEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("LoginFailedEvent");
-      }
-      emit(state.copyWith(
-          exceptionMessage: event.firebaseAuthException,
-          lastEvent: AuthenticationEventType.loginFailedEvent));
-    });
+      emit(LoginSuccessState(credential: credential));
+    }
+    emit(AuthenticationInitialState());
   }
 }
