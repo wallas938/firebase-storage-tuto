@@ -1,13 +1,16 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
-import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
+import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final void Function()? togglePages;
+
+  const LoginPage({super.key, required this.togglePages});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -73,7 +76,7 @@ class _LoginPageState extends State<LoginPage> {
 
             if (value.length < 6) {
               fieldsData[field]?.errorMessage =
-              'Your password must be at least six characters long.';
+                  'Your password must be at least six characters long.';
               fieldsData[field]?.hasError = FieldErrorState.invalid;
             } else {
               fieldsData[field]?.errorMessage = null;
@@ -87,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
 
   bool isAllFieldsAreValid() {
     bool isValid = fieldNames.every((fieldName) =>
-    fieldsData[fieldName]!.hasError == FieldErrorState.valid);
+        fieldsData[fieldName]!.hasError == FieldErrorState.valid);
     setState(() {
       if (isValid) {
         formState = true;
@@ -111,135 +114,126 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  showEventPage(AppUserCredential credential) {
+  showEventPage(AppUser user) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EventPage(credential: credential),
+          builder: (context) => const EventPage(),
         ));
   }
 
-  void login() async {
+  void login(AuthenticationBloc authBloc) async {
     final String email = fieldsData['email']!.textEditingController.text;
 
     final String password = fieldsData['password']!.textEditingController.text;
 
-    context.read<AuthenticationBloc>().add(LoginEvent(
-        credential: AppUserCredential.login(email: email, password: password)));
+    authBloc.add(LoginEvent(
+        credential: AppUserCredential(email: email, password: password)));
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenH = MediaQuery
-        .of(context)
-        .size
-        .height;
+    final authBloc = context
+        .read<AuthenticationBloc>();
+    final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Padding(
-          padding: EdgeInsets.only(top: screenH / 4),
-          child: Center(
-            child: SizedBox(
-              width: 500,
-              child: Column(
-                children: [
-                  TextField(
-                    onChanged: (text) {
-                      validateField('email', text);
-                    },
-                    focusNode: fieldsData['email']?.focusNode,
-                    controller: fieldsData['email']?.textEditingController,
-                    decoration: InputDecoration(
-                        hintText: 'Enter an email',
-                        labelText: "Email",
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        errorText: !fieldsData['email']!.isFocused &&
+      padding: EdgeInsets.only(top: screenH / 4),
+      child: Center(
+        child: SizedBox(
+          width: 500,
+          child: Column(
+            children: [
+              TextField(
+                onChanged: (text) {
+                  validateField('email', text);
+                },
+                focusNode: fieldsData['email']?.focusNode,
+                controller: fieldsData['email']?.textEditingController,
+                decoration: InputDecoration(
+                    hintText: 'Enter an email',
+                    labelText: "Email",
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    errorText: !fieldsData['email']!.isFocused &&
                             fieldsData['email']!.hasError ==
                                 FieldErrorState.invalid
-                            ? fieldsData['email']?.errorMessage
-                            : null),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  TextField(
-                    onChanged: (text) {
-                      validateField('password', text);
-                    },
-                    focusNode: fieldsData['password']?.focusNode,
-                    controller: fieldsData['password']?.textEditingController,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                        hintText: 'Enter your password',
-                        labelText: "Password",
-                        filled: true,
-                        fillColor: Colors.grey[100],
-                        errorText: !fieldsData['password']!.isFocused &&
+                        ? fieldsData['email']?.errorMessage
+                        : null),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              TextField(
+                onChanged: (text) {
+                  validateField('password', text);
+                },
+                focusNode: fieldsData['password']?.focusNode,
+                controller: fieldsData['password']?.textEditingController,
+                obscureText: true,
+                decoration: InputDecoration(
+                    hintText: 'Enter your password',
+                    labelText: "Password",
+                    filled: true,
+                    fillColor: Colors.grey[100],
+                    errorText: !fieldsData['password']!.isFocused &&
                             fieldsData['password']!.hasError ==
                                 FieldErrorState.invalid
-                            ? fieldsData['password']?.errorMessage
-                            : null),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                    builder: (context, state) {
-                      return Visibility(
-                        visible: state is AuthenticationLoadingState,
-                        child: const CircularProgressIndicator(),
-                      );
-                    },
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  BlocConsumer<AuthenticationBloc, AuthenticationState>(
-                    listener: (context, state) {
-                      if (state is LoginSuccessState) {
-                        showEventPage(state.credential);
-                      }
-                    },
-                    builder: (context, state) {
-                      return TextButton(
-                        onPressed: formState ? login : null,
-                        style: ButtonStyle(
-                          foregroundColor: WidgetStateProperty.resolveWith<
-                              Color>(
-                                (Set<WidgetState> states) {
-                              if (states.contains(WidgetState.disabled)) {
-                                return Colors.grey;
-                              }
-                              return Colors.blue;
-                            },
-                          ),
-                          overlayColor: WidgetStateProperty.all(Colors
-                              .transparent),
-                        ),
-                        child: const Text("Submit"),
-                      );
-                    },
-                  ),
-                  Visibility(
-                    visible: serverError.isNotEmpty,
-                    child: Text(serverError),
-                  ),
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const SignUpPage(),
-                          ),
-                        );
-                      },
-                      child: const Text("Create an account?")),
-                ],
+                        ? fieldsData['password']?.errorMessage
+                        : null),
               ),
-            ),
+              const SizedBox(
+                height: 40,
+              ),
+              BlocBuilder<AuthenticationBloc, AuthenticationState>(
+                builder: (context, state) {
+                  return Visibility(
+                    visible: state is AuthenticationLoadingState,
+                    child: const CircularProgressIndicator(),
+                  );
+                },
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              BlocConsumer<UserBloc, UserState>(
+                listener: (context, state) {
+                  if (state is UserFetchedState) {
+                    showEventPage(state.user);
+                  }
+                },
+                builder: (context, state) {
+                  return TextButton(
+                    onPressed: formState ? () => login(authBloc) : null,
+                    style: ButtonStyle(
+                      foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) {
+                          if (states.contains(WidgetState.disabled)) {
+                            return Colors.grey;
+                          }
+                          return Colors.blue;
+                        },
+                      ),
+                      overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    ),
+                    child: const Text("Submit"),
+                  );
+                },
+              ),
+              Visibility(
+                visible: serverError.isNotEmpty,
+                child: Text(serverError),
+              ),
+              const SizedBox(
+                height: 40,
+              ),
+              GestureDetector(
+                  onTap: widget.togglePages!,
+                  child: const Text("Create an account?")),
+            ],
           ),
-        ));
+        ),
+      ),
+    ));
   }
 }

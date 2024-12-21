@@ -27,7 +27,7 @@ class AuthenticationBloc
 
   _signup(event, emit) async {
     if (kDebugMode) {
-      print("SignupStartEvent");
+      print("SignupEvent");
     }
     try {
       emit(AuthenticationLoadingState());
@@ -35,7 +35,15 @@ class AuthenticationBloc
       AppUserCredential? credential =
           await authenticationRepository.signup(event.credential);
       if (credential != null) {
-        emit(LoginSuccessState(credential: credential));
+        if (kDebugMode) {
+          print("AuthenticationBloc : signup ${credential.uid}");
+        }
+        add(LoginEvent(
+            credential: AppUserCredential(
+                uid: credential.uid,
+                name: credential.name,
+                email: credential.email,
+                password: credential.password)));
       }
     } on FirebaseAuthException catch (e) {
       FirebaseAuthException error = FirebaseAuthException(
@@ -52,15 +60,18 @@ class AuthenticationBloc
 
   _login(event, emit) async {
     if (kDebugMode) {
-      print("LoginStartEvent");
+      print("LoginEvent");
     }
     try {
       emit(AuthenticationLoadingState());
 
       AppUserCredential? credential =
           await authenticationRepository.login(event.credential);
+
       if (credential != null) {
-        emit(LoginSuccessState(credential: credential));
+        emit(LoginSuccessState(
+            credential: AppUserCredential(
+                email: credential.email, name: credential.name, uid: credential.uid)));
       }
     } on FirebaseAuthException catch (e) {
       FirebaseAuthException error = FirebaseAuthException(
@@ -81,9 +92,6 @@ class AuthenticationBloc
     AppUserCredential? credential = authenticationRepository.getCurrentUser();
 
     if (credential != null) {
-      if (kDebugMode) {
-        print(credential.uid);
-      }
       emit(LoginSuccessState(credential: credential));
     }
     emit(AuthenticationInitialState());

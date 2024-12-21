@@ -5,17 +5,24 @@ import 'package:flutter/foundation.dart';
 class FirebaseAuthenticationProvider {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  Future<AppUserCredential?> signup(
-      String name, String email, String password) async {
+  Future<AppUserCredential?> signup(AppUserCredential credential) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential data = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: credential.email, password: credential.password!);
 
-      if (userCredential.user != null) {
-        // await _firebaseFirestore.collection("users").add(user.toJson());
+      if (data.user != null) {
+        AppUserCredential appUserCredential = AppUserCredential(
+            uid: data.user!.uid,
+            name: credential.name,
+            email: credential.email,
+            password: credential.password);
 
-        return AppUserCredential(
-            uid: userCredential.user!.uid, name: name, email: email);
+        if (kDebugMode) {
+          print(
+              "FirebaseAuthenticationProvider : signup ${appUserCredential.uid}");
+        }
+
+        return appUserCredential;
       }
       return null;
     } on FirebaseException catch (e) {
@@ -28,17 +35,21 @@ class FirebaseAuthenticationProvider {
     return null;
   }
 
-  Future<AppUserCredential?> login(String email, String password) async {
+  Future<AppUserCredential?> login(AppUserCredential credential) async {
     try {
-      UserCredential userCredential = await _firebaseAuth
-          .signInWithEmailAndPassword(email: email, password: password);
+      UserCredential data = await _firebaseAuth.signInWithEmailAndPassword(
+          email: credential.email, password: credential.password!);
 
-      if (userCredential.user != null) {
+      if (data.user != null) {
+        AppUserCredential appUserCredential = AppUserCredential(
+            uid: data.user!.uid,
+            name: credential.name,
+            email: credential.email);
+        if (kDebugMode) {
+          print("AuthenticationBloc : signup ${credential.uid}");
+        }
         // await _firebaseFirestore.collection("users").add(user.toJson());
-        return AppUserCredential(
-            uid: userCredential.user!.uid,
-            name: userCredential.user!.displayName,
-            email: email);
+        return appUserCredential;
       }
       return null;
     } on FirebaseException catch (e) {

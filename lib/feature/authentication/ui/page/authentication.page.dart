@@ -1,3 +1,4 @@
+import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,13 @@ class AuthenticationPage extends StatefulWidget {
 class _AuthenticationPageState extends State<AuthenticationPage> {
   bool showLoginPage = true;
 
+  // toggle between pages
+  void togglePages() {
+    setState(() {
+      showLoginPage = !showLoginPage;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -19,9 +27,10 @@ class _AuthenticationPageState extends State<AuthenticationPage> {
 
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      body: const SignUpPage(),
-      // body: showLoginPage ? const LoginPage() : const SignUpPage(),
+    return Scaffold(
+      body: showLoginPage
+          ? LoginPage(togglePages: togglePages)
+          : SignUpPage(togglePages: togglePages),
     );
   }
 }
