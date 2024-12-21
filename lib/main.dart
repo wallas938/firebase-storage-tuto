@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage_tuto/feature/authentication/data/provider/firebase.authentication.provider.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/authentication.page.dart';
-import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/feature/user/data/provider/firebase.app.user.provider.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/repository/user.repository.implementation.dart';
@@ -45,23 +44,26 @@ class MyApp extends StatelessWidget {
         child: BlocBuilder<AuthenticationBloc, AuthenticationState>(
           builder: (context, authState) => MaterialApp(
               debugShowCheckedModeBanner: false,
+              initialRoute: '/',
+              routes: const {},
               home: Scaffold(
                 body: BlocBuilder<UserBloc, UserState>(
                   builder: (context, userState) {
+                    return const AuthenticationPage();
                     // authenticated -> home page
-                    if (userState is UserFetchedState) {
-                      return EventPage(
-                        user: userState.user,
-                      );
-                    }
-
-                    // unauthenticated -> auth page (login/register)
-                    if (authState is AuthenticationInitialState) {
-                      return const AuthenticationPage();
-                    }
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
+                    // if (userState is UserFetchedState) {
+                    //   return EventPage(
+                    //     user: userState.user,
+                    //   );
+                    // }
+                    //
+                    // // unauthenticated -> auth page (login/register)
+                    // if (authState is AuthenticationInitialState) {
+                    //   return const AuthenticationPage();
+                    // }
+                    // return const Center(
+                    //   child: CircularProgressIndicator(),
+                    // );
                   },
                 ),
               )),

@@ -10,14 +10,12 @@ class AuthenticationRepositoryImpl extends AuthenticationRepository {
 
   @override
   Future<AppUserCredential?> signup(AppUserCredential credential) async {
-    return await firebaseAuthenticationProvider.signup(
-        credential.name!, credential.email, credential.password!);
+    return await firebaseAuthenticationProvider.signup(credential);
   }
 
   @override
   Future<AppUserCredential?> login(AppUserCredential credential) async {
-    return await firebaseAuthenticationProvider.login(
-        credential.email, credential.password!);
+    return await firebaseAuthenticationProvider.login(credential);
   }
 
   @override

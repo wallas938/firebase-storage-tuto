@@ -1,8 +1,6 @@
-import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AuthenticationPage extends StatefulWidget {
   const AuthenticationPage({super.key});

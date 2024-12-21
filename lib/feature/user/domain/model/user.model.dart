@@ -1,6 +1,6 @@
 /// AppUser Data is used for defining app users
 class AppUser {
-  final String id;
+  final String uid;
   final String email;
   final String username;
   final String? phone;
@@ -22,7 +22,7 @@ class AppUser {
   final String? language;
 
   AppUser({
-    required this.id,
+    required this.uid,
     required this.email,
     required this.username,
     this.phone,
@@ -45,7 +45,7 @@ class AppUser {
   });
 
   AppUser.baseUser(
-      {required this.id, required this.email, required this.username})
+      {required this.uid, required this.email, required this.username})
       : attendedEvents = [],
         bio = '',
         coordinates = null,
@@ -59,7 +59,7 @@ class AppUser {
         lastLogin = DateTime.now(),
         location = null,
         notificationPreferences = null,
-        phone = null,
+        phone = '',
         points = 0,
         profilePicture = null,
         socialLinks = null;
@@ -86,7 +86,7 @@ class AppUser {
     String? language,
   }) {
     return AppUser(
-      id: id,
+      uid: uid,
       email: email ?? this.email,
       username: username ?? this.username,
       phone: phone ?? this.phone,
@@ -112,7 +112,7 @@ class AppUser {
 
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
-      id: json['id'],
+      uid: json['uid'],
       email: json['email'],
       username: json['username'],
       phone: json['phone'],
@@ -162,7 +162,7 @@ class AppUser {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'uid': uid,
       'email': email,
       'username': username,
       'phone': phone,

@@ -1,6 +1,5 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
-import 'package:firebase_storage_tuto/feature/authentication/ui/page/signup.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
@@ -9,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class LoginPage extends StatefulWidget {
-
   final void Function()? togglePages;
 
   const LoginPage({super.key, required this.togglePages});
@@ -120,21 +118,23 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EventPage(user: user),
+          builder: (context) => const EventPage(),
         ));
   }
 
-  void login() async {
+  void login(AuthenticationBloc authBloc) async {
     final String email = fieldsData['email']!.textEditingController.text;
 
     final String password = fieldsData['password']!.textEditingController.text;
 
-    context.read<AuthenticationBloc>().add(LoginEvent(
-        credential: AppUserCredential.login(email: email, password: password)));
+    authBloc.add(LoginEvent(
+        credential: AppUserCredential(email: email, password: password)));
   }
 
   @override
   Widget build(BuildContext context) {
+    final authBloc = context
+        .read<AuthenticationBloc>();
     final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Padding(
@@ -204,7 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                 },
                 builder: (context, state) {
                   return TextButton(
-                    onPressed: formState ? login : null,
+                    onPressed: formState ? () => login(authBloc) : null,
                     style: ButtonStyle(
                       foregroundColor: WidgetStateProperty.resolveWith<Color>(
                         (Set<WidgetState> states) {
@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
                 height: 40,
               ),
               GestureDetector(
-                  onTap:widget.togglePages!,
+                  onTap: widget.togglePages!,
                   child: const Text("Create an account?")),
             ],
           ),

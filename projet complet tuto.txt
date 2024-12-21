@@ -2,7 +2,7 @@ Bien sûr, voici un projet complet:
 
 1. **Interface utilisateur avec Flutter :**
    - Conception d'une application mobile pour gérer des événements.
-   - Affichage des événements, création et modification.
+   - Affichage des événements, création et modification.u
 
 2. **Authentification avec Firebase Auth:**
    - Connexion, inscription, et gestion des profils utilisateurs.

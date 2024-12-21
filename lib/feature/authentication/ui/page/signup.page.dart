@@ -1,6 +1,5 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
-import 'package:firebase_storage_tuto/feature/authentication/ui/page/login.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
@@ -19,7 +18,6 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   List<String> fieldNames = ['name', 'email', 'password', 'confirmedPassword'];
-
   final Map<String, FieldData> fieldsData = {};
   final Map<String, String?> errors = {};
   String serverError = '';
@@ -143,30 +141,32 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
-  void signup() async {
+  void signup(AuthenticationBloc authBloc) async {
     final name = fieldsData['name']!.textEditingController.text;
     final email = fieldsData['email']!.textEditingController.text;
     final password = fieldsData['password']!.textEditingController.text;
 
     AppUserCredential appUserCredential =
-        AppUserCredential.signup(name: name, email: email, password: password);
+        AppUserCredential(name: name, email: email, password: password);
 
-    context
-        .read<AuthenticationBloc>()
-        .add(RegisterUserEvent(credential: appUserCredential));
+    authBloc.add(RegisterUserEvent(credential: appUserCredential));
   }
 
   showEventPage(AppUser user) {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => EventPage(user: user),
+          builder: (context) => const EventPage(),
         ));
   }
 
   @override
   Widget build(BuildContext context) {
+    final authBloc = context.read<AuthenticationBloc>();
+
+    final userBloc = context.read<UserBloc>();
     final screenH = MediaQuery.of(context).size.height;
+
     return Scaffold(
         body: Padding(
       padding: EdgeInsets.only(top: screenH / 8),
@@ -273,24 +273,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
                 BlocBuilder<AuthenticationBloc, AuthenticationState>(
                   builder: (context, state) {
-                    if (state is AuthenticationLoadingState) {
+                    if (state is LoginSuccessState) {
+                      userBloc
+                          .add(CreateUserEvent(credential: state.credential));
+
                       return const CircularProgressIndicator();
                     }
-                    return Container();
-                  },
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                BlocConsumer<UserBloc, UserState>(
-                  listener: (context, state) {
-                    if (state is UserCreatedState) {
-                      showEventPage(state.newUser);
-                    }
-                  },
-                  builder: (context, state) {
                     return TextButton(
-                      onPressed: formState ? signup : null,
+                      onPressed: formState ? () => signup(authBloc) : null,
                       style: ButtonStyle(
                         foregroundColor: WidgetStateProperty.resolveWith<Color>(
                           (Set<WidgetState> states) {
@@ -307,9 +297,26 @@ class _SignUpPageState extends State<SignUpPage> {
                     );
                   },
                 ),
-                Visibility(
-                  visible: serverError.isNotEmpty,
-                  child: Text(serverError),
+                const SizedBox(
+                  height: 40,
+                ),
+                BlocListener<UserBloc, UserState>(
+                  listener: (context, state) {
+                    if (state is UserCreatedState) {
+                      showEventPage(state.newUser);
+                    }
+                  },
+                  child: Container(),
+                ),
+                BlocListener<AuthenticationBloc, AuthenticationState>(
+                  listener: (context, state) {
+                    if (state is RegisterFailureState) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text(state.firebaseAuthException.message!),
+                      ));
+                    }
+                  },
+                  child: Container(),
                 ),
                 const SizedBox(
                   height: 40,

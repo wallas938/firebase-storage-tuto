@@ -20,7 +20,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       }
       try {
         emit(UserLoadingState());
-
         AppUser? user = await userRepository.createUser(event.credential);
         if (user != null) {
           emit(UserCreatedState(newUser: user));

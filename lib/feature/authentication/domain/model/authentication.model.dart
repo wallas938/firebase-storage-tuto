@@ -8,14 +8,11 @@ class AppUserCredential {
   String? password;
 
   AppUserCredential({
-    required this.uid,
-    required this.name,
+    this.uid,
+    this.name,
     required this.email,
+    this.password,
   });
-
-  AppUserCredential.signup({required this.name, required this.email, required this.password});
-
-  AppUserCredential.login({required this.email, required this.password});
 
   AppUserCredential copyWith({
     String? uid,

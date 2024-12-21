@@ -6,12 +6,19 @@ import 'package:flutter/foundation.dart';
 class FirebaseAppUserProvider {
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  Future<AppUser?> createUser(AppUserCredential credentials) async {
+  Future<AppUser?> createUser(AppUserCredential credential) async {
+    if (kDebugMode) {
+      print("createUser : ${credential.uid}");
+    }
     try {
+      if (kDebugMode) {
+        print("AppUser user : ${credential.name}");
+      }
       AppUser user = AppUser.baseUser(
-          id: credentials.uid!,
-          email: credentials.email,
-          username: credentials.name!);
+          uid: credential.uid!,
+          email: credential.email,
+          username: credential.name!);
+
 
       await _firebaseFirestore.collection("users").add(user.toJson());
 
