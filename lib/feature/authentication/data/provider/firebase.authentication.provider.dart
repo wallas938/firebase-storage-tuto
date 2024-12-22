@@ -41,13 +41,11 @@ class FirebaseAuthenticationProvider {
           email: credential.email, password: credential.password!);
 
       if (data.user != null) {
+
         AppUserCredential appUserCredential = AppUserCredential(
             uid: data.user!.uid,
             name: credential.name,
             email: credential.email);
-        if (kDebugMode) {
-          print("AuthenticationBloc : signup ${credential.uid}");
-        }
         // await _firebaseFirestore.collection("users").add(user.toJson());
         return appUserCredential;
       }

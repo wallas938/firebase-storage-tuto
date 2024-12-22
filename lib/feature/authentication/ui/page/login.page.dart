@@ -6,6 +6,7 @@ import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart'
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   final void Function()? togglePages;
@@ -114,12 +115,8 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  showEventPage(AppUser user) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const EventPage(),
-        ));
+  showEventPage() {
+    GoRouter.of(context).go("/events");
   }
 
   void showSnackBar(String errorMessage) {
@@ -139,8 +136,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final authBloc = context
-        .read<AuthenticationBloc>();
+    final authBloc = context.read<AuthenticationBloc>();
     final screenH = MediaQuery.of(context).size.height;
     return Scaffold(
         body: Padding(
@@ -202,10 +198,10 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 40,
               ),
-              BlocConsumer<UserBloc, UserState>(
+              BlocConsumer<AuthenticationBloc, AuthenticationState>(
                 listener: (context, state) {
-                  if (state is UserFetchedState) {
-                    showEventPage(state.user);
+                  if (state is LoginSuccessState) {
+                    showEventPage();
                   }
                 },
                 builder: (context, state) {
@@ -233,16 +229,15 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 40,
               ),
-              GestureDetector(
-                  onTap: widget.togglePages!,
-                  child: const Text("Create an account?")),
               BlocListener<AuthenticationBloc, AuthenticationState>(
                 listener: (context, state) {
                   if (state is LoginFailureState) {
                     showSnackBar(state.firebaseAuthException.message!);
                   }
                 },
-                child: Container(),
+                child: GestureDetector(
+                    onTap: widget.togglePages!,
+                    child: const Text("Create an account?")),
               ),
             ],
           ),
