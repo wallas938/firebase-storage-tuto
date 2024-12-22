@@ -159,8 +159,8 @@ class _SignUpPageState extends State<SignUpPage> {
     authBloc.add(RegisterUserEvent(credential: appUserCredential));
   }
 
-  showEventPage(AppUser user) {
-    GoRouter.of(context).go("events");
+  showEventPage() {
+    GoRouter.of(context).go("/events");
   }
 
   @override
@@ -274,57 +274,37 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(
                   height: 40,
                 ),
-                BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                  builder: (context, state) {
-                    if (state is LoginSuccessState) {
-                      userBloc
-                          .add(CreateUserEvent(credential: state.credential));
-
-                      return const CircularProgressIndicator();
-                    }
-                    return TextButton(
-                      onPressed: formState ? () => signup(authBloc) : null,
-                      style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                          (Set<WidgetState> states) {
-                            if (states.contains(WidgetState.disabled)) {
-                              return Colors.grey;
-                            }
-                            return Colors.blue;
-                          },
-                        ),
-                        overlayColor:
-                            WidgetStateProperty.all(Colors.transparent),
-                      ),
-                      child: const Text("Submit"),
-                    );
-                  },
+                TextButton(
+                  onPressed: formState ? () => signup(authBloc) : null,
+                  style: ButtonStyle(
+                    foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                      (Set<WidgetState> states) {
+                        if (states.contains(WidgetState.disabled)) {
+                          return Colors.grey;
+                        }
+                        return Colors.blue;
+                      },
+                    ),
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                  ),
+                  child: const Text("Submit"),
                 ),
                 const SizedBox(
                   height: 40,
                 ),
-                BlocListener<UserBloc, UserState>(
-                  listener: (context, state) {
-                    if (state is UserCreatedState) {
-                      showEventPage(state.newUser);
-                    }
-                  },
-                  child: Container(),
-                ),
                 BlocListener<AuthenticationBloc, AuthenticationState>(
                   listener: (context, state) {
+                    if (state is LoginSuccessState) {
+                      showEventPage();
+                    }
                     if (state is RegisterFailureState) {
                       showSnackBar(state.firebaseAuthException.message!);
                     }
                   },
-                  child: Container(),
+                  child: GestureDetector(
+                      onTap: widget.togglePages!,
+                      child: const Text("Already have an account?")),
                 ),
-                const SizedBox(
-                  height: 40,
-                ),
-                GestureDetector(
-                    onTap: widget.togglePages!,
-                    child: const Text("Already have an account?")),
               ],
             ),
           ),
