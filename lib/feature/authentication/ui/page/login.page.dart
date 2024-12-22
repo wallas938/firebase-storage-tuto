@@ -122,6 +122,12 @@ class _LoginPageState extends State<LoginPage> {
         ));
   }
 
+  void showSnackBar(String errorMessage) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(errorMessage),
+    ));
+  }
+
   void login(AuthenticationBloc authBloc) async {
     final String email = fieldsData['email']!.textEditingController.text;
 
@@ -230,6 +236,14 @@ class _LoginPageState extends State<LoginPage> {
               GestureDetector(
                   onTap: widget.togglePages!,
                   child: const Text("Create an account?")),
+              BlocListener<AuthenticationBloc, AuthenticationState>(
+                listener: (context, state) {
+                  if (state is LoginFailureState) {
+                    showSnackBar(state.firebaseAuthException.message!);
+                  }
+                },
+                child: Container(),
+              ),
             ],
           ),
         ),

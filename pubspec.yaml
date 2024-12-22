@@ -44,6 +44,8 @@ dependencies:
   cached_network_image: ^3.4.1
   equatable: ^2.0.7
   get_it: ^8.0.3
+  go_router:
+  url_strategy:
 
 dev_dependencies:
   flutter_test:

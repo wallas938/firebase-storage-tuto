@@ -6,6 +6,7 @@ import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart'
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 class SignUpPage extends StatefulWidget {
   final void Function()? togglePages;
@@ -20,15 +21,21 @@ class _SignUpPageState extends State<SignUpPage> {
   List<String> fieldNames = ['name', 'email', 'password', 'confirmedPassword'];
   final Map<String, FieldData> fieldsData = {};
   final Map<String, String?> errors = {};
-  String serverError = '';
-  String tempPassword = '';
-  bool formState = false;
   late RegExp regex = RegExp(emailPattern);
+  String tempPassword = '';
+  String serverError = '';
+  bool formState = false;
 
   @override
   void initState() {
     initFieldsData(fieldNames);
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    disposeControllers();
+    super.dispose();
   }
 
   void initFieldsData(List<String> fields) {
@@ -129,10 +136,10 @@ class _SignUpPageState extends State<SignUpPage> {
     });
   }
 
-  @override
-  void dispose() {
-    disposeControllers();
-    super.dispose();
+  void showSnackBar(String errorMessage) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(errorMessage),
+    ));
   }
 
   void disposeControllers() {
@@ -153,11 +160,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   showEventPage(AppUser user) {
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const EventPage(),
-        ));
+    GoRouter.of(context).go("events");
   }
 
   @override
@@ -311,9 +314,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 BlocListener<AuthenticationBloc, AuthenticationState>(
                   listener: (context, state) {
                     if (state is RegisterFailureState) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(state.firebaseAuthException.message!),
-                      ));
+                      showSnackBar(state.firebaseAuthException.message!);
                     }
                   },
                   child: Container(),
