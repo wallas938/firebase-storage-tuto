@@ -20,7 +20,7 @@ class FirebaseAppUserProvider {
           username: credential.name!);
 
 
-      await _firebaseFirestore.collection("users").add(user.toJson());
+      await _firebaseFirestore.collection("users").doc(credential.uid!).set(user.toJson());
 
       // DocumentSnapshot<Map<String, dynamic>>? doc =
       // await _firebaseFirestore.collection("users").add(data)
@@ -36,13 +36,18 @@ class FirebaseAppUserProvider {
     }
   }
 
-  Future<AppUser?> getUserByUid(String id) async {
+  Future<AppUser?> getUserByUid(String uid) async {
     try {
-      DocumentSnapshot<Map<String, dynamic>>? doc =
-          await _firebaseFirestore.collection("users").doc(id).get();
-
-      if (doc.exists) {
-        AppUser user = AppUser.fromJson(doc.data()!);
+      final userDoc =
+      await _firebaseFirestore.collection('users').doc(uid).get();
+      if (kDebugMode) {
+        print("FetchUserEvent ${userDoc.exists}");
+      }
+      if (kDebugMode) {
+        print("${userDoc.data()!}");
+      }
+      if (userDoc.exists) {
+        AppUser user = AppUser.fromJson(userDoc.data()!);
         // await _firebaseFirestore.collection("users").add(user.toJson());
         return user;
       }

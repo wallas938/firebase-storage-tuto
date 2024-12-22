@@ -13,10 +13,10 @@ final class CreateUserEvent extends UserEvent {
   List<Object> get props => [credential];
 }
 
-final class GetUserEvent extends UserEvent {
+final class FetchUserEvent extends UserEvent {
   final String id;
 
-  const GetUserEvent({required this.id});
+  const FetchUserEvent({required this.id});
 
   @override
   List<Object> get props => [id];

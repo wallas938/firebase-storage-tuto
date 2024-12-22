@@ -27,7 +27,7 @@ class AuthenticationBloc
 
   _signup(event, emit) async {
     if (kDebugMode) {
-      print("SignupEvent");
+      print("RegisterUserEvent");
     }
     try {
       emit(AuthenticationLoadingState());
@@ -35,9 +35,6 @@ class AuthenticationBloc
       AppUserCredential? credential =
           await authenticationRepository.signup(event.credential);
       if (credential != null) {
-        if (kDebugMode) {
-          print("AuthenticationBloc : signup ${credential.uid}");
-        }
         add(LoginEvent(
             credential: AppUserCredential(
                 uid: credential.uid,
@@ -87,12 +84,17 @@ class AuthenticationBloc
   }
 
   _checkUserAuthentication(event, emit) {
+    if (kDebugMode) {
+      print("CheckAuthenticationEvent");
+    }
     emit(AuthenticationLoadingState());
 
     AppUserCredential? credential = authenticationRepository.getCurrentUser();
 
     if (credential != null) {
+
       emit(LoginSuccessState(credential: credential));
+
     }
     emit(AuthenticationInitialState());
   }

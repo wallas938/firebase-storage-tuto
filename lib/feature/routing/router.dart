@@ -28,11 +28,13 @@ final routes = GoRouter(
       }),
     ),
     GoRoute(
-      name: 'user-profile',
+      name: 'user',
       // Optional, add name to your routes. Allows you navigate by name instead of path
-      path: '/user-profile',
+      path: '/user/:id',
       builder: ((context, state) {
-        return const UserProfilePage();
+        return UserProfilePage(
+          uid: state.pathParameters['id'].toString(),
+        );
       }),
     ),
   ],
