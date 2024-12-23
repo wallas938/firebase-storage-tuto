@@ -1,8 +1,6 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/authentication/domain/model/authentication.model.dart';
-import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
-import 'package:firebase_storage_tuto/feature/user/domain/model/user.model.dart';
 import 'package:firebase_storage_tuto/shared/form/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -166,8 +164,8 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     final authBloc = context.read<AuthenticationBloc>();
-
     final userBloc = context.read<UserBloc>();
+
     final screenH = MediaQuery.of(context).size.height;
 
     return Scaffold(
@@ -293,12 +291,14 @@ class _SignUpPageState extends State<SignUpPage> {
                   height: 40,
                 ),
                 BlocListener<AuthenticationBloc, AuthenticationState>(
-                  listener: (context, state) {
-                    if (state is LoginSuccessState) {
+                  listener: (context, authState) {
+                    if (authState is LoginSuccessState) {
+                      userBloc.add(
+                          CreateUserEvent(credential: authState.credential));
                       showEventPage();
                     }
-                    if (state is RegisterFailureState) {
-                      showSnackBar(state.firebaseAuthException.message!);
+                    if (authState is RegisterFailureState) {
+                      showSnackBar(authState.firebaseAuthException.message!);
                     }
                   },
                   child: GestureDetector(

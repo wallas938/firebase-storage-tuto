@@ -14,34 +14,41 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   UserBloc(this.userRepository) : super(UserInitialState()) {
     /// CREATE A NEW USER
-    on<CreateUserEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("CreateUserEvent");
-      }
-      try {
-        emit(UserLoadingState());
-        AppUser? user = await userRepository.createUser(event.credential);
-        if (user != null) {
-          emit(UserCreatedState(newUser: user));
-        }
-      } on Exception catch (error) {
-        emit(UserCreationFailureState(exception: Exception(error)));
-      }
-    });
-    on<GetUserEvent>((event, emit) async {
-      if (kDebugMode) {
-        print("CreateUserEvent");
-      }
-      try {
-        emit(UserLoadingState());
+    on<CreateUserEvent>(_createUser);
+    on<FetchUserEvent>(_fetchUser);
+  }
 
-        AppUser? user = await userRepository.getUserById(event.id);
-        if (user != null) {
-          emit(UserFetchedState(user: user));
-        }
-      } on Exception catch (error) {
-        emit(UserCreationFailureState(exception: Exception(error)));
+  _createUser(event, emit) async {
+    if (kDebugMode) {
+      print("CreateUserEvent");
+    }
+    try {
+      emit(UserLoadingState());
+
+      await userRepository.createUser(event.credential);
+
+      emit(UserCreatedState());
+
+      add(FetchUserEvent(id: event.credential.uid));
+
+    } on Exception catch (error) {
+      emit(UserCreationFailureState(exception: Exception(error)));
+    }
+  }
+
+  _fetchUser(event, emit) async {
+    if (kDebugMode) {
+      print("FetchUserEvent");
+    }
+    try {
+      emit(UserLoadingState());
+
+      AppUser? user = await userRepository.getUserById(event.id);
+      if (user != null) {
+        emit(UserFetchedState(user: user));
       }
-    });
+    } on Exception catch (error) {
+      emit(UserCreationFailureState(exception: Exception(error)));
+    }
   }
 }

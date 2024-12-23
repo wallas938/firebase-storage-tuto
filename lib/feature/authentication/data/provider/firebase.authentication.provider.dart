@@ -46,7 +46,7 @@ class FirebaseAuthenticationProvider {
             uid: data.user!.uid,
             name: credential.name,
             email: credential.email);
-        // await _firebaseFirestore.collection("users").add(user.toJson());
+
         return appUserCredential;
       }
       return null;

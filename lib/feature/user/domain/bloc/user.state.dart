@@ -13,12 +13,10 @@ final class UserLoadingState extends UserState {
 }
 
 final class UserCreatedState extends UserState {
-  final AppUser newUser;
-
-  UserCreatedState({required this.newUser});
+  UserCreatedState();
 
   @override
-  List<Object?> get props => [newUser];
+  List<Object?> get props => [];
 }
 
 final class UserCreationFailureState extends UserState {
@@ -27,7 +25,7 @@ final class UserCreationFailureState extends UserState {
   UserCreationFailureState({required this.exception});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [exception];
 }
 
 final class UserFetchedState extends UserState {
@@ -36,5 +34,14 @@ final class UserFetchedState extends UserState {
   UserFetchedState({required this.user});
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [user];
+}
+
+final class UserFetchingFailure extends UserState {
+  final Exception exception;
+
+  UserFetchingFailure({required this.exception});
+
+  @override
+  List<Object?> get props => [exception];
 }

@@ -8,19 +8,18 @@ class FirebaseAppUserProvider {
 
   Future<AppUser?> createUser(AppUserCredential credential) async {
     if (kDebugMode) {
-      print("createUser : ${credential.uid}");
+      print("FirebaseAppUserProvider createUser(uid) : ${credential.uid}");
     }
     try {
-      if (kDebugMode) {
-        print("AppUser user : ${credential.name}");
-      }
       AppUser user = AppUser.baseUser(
           uid: credential.uid!,
           email: credential.email,
           username: credential.name!);
 
-
-      await _firebaseFirestore.collection("users").add(user.toJson());
+      await _firebaseFirestore
+          .collection("users")
+          .doc(credential.uid!)
+          .set(user.toJson());
 
       // DocumentSnapshot<Map<String, dynamic>>? doc =
       // await _firebaseFirestore.collection("users").add(data)
@@ -36,14 +35,17 @@ class FirebaseAppUserProvider {
     }
   }
 
-  Future<AppUser?> getUserByUid(String id) async {
+  Future<AppUser?> getUserByUid(String uid) async {
+    if (kDebugMode) {
+      print("FirebaseAppUserProvider getUserByUid(uid) $uid");
+    }
     try {
-      DocumentSnapshot<Map<String, dynamic>>? doc =
-          await _firebaseFirestore.collection("users").doc(id).get();
+      final userDoc =
+          await _firebaseFirestore.collection('users').doc(uid).get();
 
-      if (doc.exists) {
-        AppUser user = AppUser.fromJson(doc.data()!);
-        // await _firebaseFirestore.collection("users").add(user.toJson());
+      if (userDoc.exists) {
+        AppUser user = AppUser.fromJson(userDoc.data()!);
+
         return user;
       }
       return null;
