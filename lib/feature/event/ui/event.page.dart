@@ -1,5 +1,4 @@
 import 'package:firebase_storage_tuto/shared/widget/app.drawer.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class EventPage extends StatefulWidget {

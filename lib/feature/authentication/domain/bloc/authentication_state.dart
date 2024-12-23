@@ -44,3 +44,12 @@ final class LoginFailureState extends AuthenticationState {
   @override
   List<Object> get props => [firebaseAuthException];
 }
+
+final class AuthenticatedState extends AuthenticationState {
+  final AppUserCredential credential;
+
+  const AuthenticatedState({required this.credential});
+
+  @override
+  List<Object> get props => [credential];
+}
