@@ -1,5 +1,6 @@
 import 'package:firebase_storage_tuto/feature/authentication/ui/page/authentication.page.dart';
 import 'package:firebase_storage_tuto/feature/event/ui/event.page.dart';
+import 'package:firebase_storage_tuto/feature/user/ui/pages/edit.user.profile.page.dart';
 import 'package:firebase_storage_tuto/feature/user/ui/pages/user.profile.page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
@@ -30,10 +31,19 @@ final routes = GoRouter(
     GoRoute(
       name: 'user',
       // Optional, add name to your routes. Allows you navigate by name instead of path
-      path: '/user/:id',
+      path: '/user/:uid',
+      routes: [
+        GoRoute(
+          path: 'edit', // Sous-route
+          builder: (context, state) {
+            final userId = state.pathParameters['uid'];
+            return EditUserProfilePage(uid: userId!);
+          },
+        ),
+      ],
       builder: ((context, state) {
         return UserProfilePage(
-          uid: state.pathParameters['id'].toString(),
+          uid: state.pathParameters['uid'].toString(),
         );
       }),
     ),

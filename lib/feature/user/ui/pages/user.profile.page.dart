@@ -1,5 +1,7 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
+import 'package:firebase_storage_tuto/feature/user/ui/widget/user.data.dart';
+import 'package:firebase_storage_tuto/feature/user/ui/widget/user.info.row.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,23 +52,31 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     title: Padding(
                       padding: const EdgeInsets.only(top: 18.0),
-                      child: Text("W E L C O M E  ${userState.user.uid}"),
+                      child: Text(
+                        "W E L C O M E  ${userState.user.username}",
+                        style: const TextStyle(color: Colors.white),
+                      ),
                     ),
                     actions: [
                       // upload new post button
                       Padding(
                         padding: const EdgeInsets.only(top: 18.0),
                         child: IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            context.go("/user/${userState.user.uid}/edit");
+                          },
+                          icon: const Icon(
+                            Icons.change_circle,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                body: const Center(
-                  child: Text("U S E R  P R O F I L E"),
-                ),
+
+                //userState.user.uid
+                body: UserData(user: userState.user),
               );
             }
 
