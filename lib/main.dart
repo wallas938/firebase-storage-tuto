@@ -39,7 +39,8 @@ class MyApp extends StatelessWidget {
           BlocProvider(
               create: (context) => AuthenticationBloc(
                   context.read<AuthenticationRepositoryImpl>())
-                ..add(const CheckAuthenticationEvent())),
+                // ..add(const CheckAuthenticationEvent())
+          ),
           BlocProvider(
               create: (context) => UserBloc(context.read<UserRepositoryImpl>()))
         ],

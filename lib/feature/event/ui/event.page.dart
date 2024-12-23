@@ -12,9 +12,6 @@ class EventPage extends StatefulWidget {
 class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
-    if (kDebugMode) {
-      print("_EventPageState");
-    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("H O M E"),

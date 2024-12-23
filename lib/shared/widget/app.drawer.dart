@@ -49,7 +49,7 @@ class _AppDrawerState extends State<AppDrawer> {
                     icon: Icons.person,
                     onTap: () {
                       // pop menu drawer
-                      Navigator.of(context).pop();
+                      GoRouter.of(context).pop();
 
                       if (state is LoginSuccessState) {
                         // navigate to profile page

@@ -24,10 +24,13 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     }
     try {
       emit(UserLoadingState());
-      AppUser? user = await userRepository.createUser(event.credential);
-      if (user != null) {
-        emit(UserCreatedState(newUser: user));
-      }
+
+      await userRepository.createUser(event.credential);
+
+      emit(UserCreatedState());
+
+      add(FetchUserEvent(id: event.credential.uid));
+
     } on Exception catch (error) {
       emit(UserCreationFailureState(exception: Exception(error)));
     }
@@ -39,7 +42,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     }
     try {
       emit(UserLoadingState());
-
 
       AppUser? user = await userRepository.getUserById(event.id);
       if (user != null) {

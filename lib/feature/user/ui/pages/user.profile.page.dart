@@ -15,6 +15,11 @@ final class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final userBloc = context.read<UserBloc>();
 
@@ -29,7 +34,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
         return BlocBuilder<UserBloc, UserState>(
           builder: (context, userState) {
-            if(userState is UserFetchedState) {
+            if (userState is UserInitialState) {
+              userBloc.add(FetchUserEvent(id: widget.uid));
+            }
+
+            if (userState is UserFetchedState) {
               return Scaffold(
                 appBar: PreferredSize(
                   preferredSize: const Size(double.infinity, 80),
@@ -44,7 +53,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                     title: Padding(
                       padding: const EdgeInsets.only(top: 18.0),
-                      child: Text("W E L C O M E ${userState.user.username}"),
+                      child: Text("W E L C O M E  ${userState.user.uid}"),
                     ),
                     actions: [
                       // upload new post button
@@ -63,16 +72,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               );
             }
+
             return const Center(
               child: CircularProgressIndicator(),
             );
           },
         );
-      }, listener: (BuildContext context, AuthenticationState state) {
+      },
+      listener: (BuildContext context, AuthenticationState state) {
         if (state is LoginSuccessState) {
           userBloc.add(FetchUserEvent(id: widget.uid));
         }
-    },
+      },
       // listener: (BuildContext context, UserState state) {
       //   if (state is UserInitialState) {
       //     userBloc.add(FetchUserEvent(id: widget.uid));

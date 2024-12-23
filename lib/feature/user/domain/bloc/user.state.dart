@@ -13,12 +13,10 @@ final class UserLoadingState extends UserState {
 }
 
 final class UserCreatedState extends UserState {
-  final AppUser newUser;
-
-  UserCreatedState({required this.newUser});
+  UserCreatedState();
 
   @override
-  List<Object?> get props => [newUser];
+  List<Object?> get props => [];
 }
 
 final class UserCreationFailureState extends UserState {
