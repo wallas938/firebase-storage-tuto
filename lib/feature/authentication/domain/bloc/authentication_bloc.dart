@@ -68,7 +68,9 @@ class AuthenticationBloc
       if (credential != null) {
         emit(LoginSuccessState(
             credential: AppUserCredential(
-                email: credential.email, name: credential.name, uid: credential.uid)));
+                email: credential.email,
+                name: credential.name,
+                uid: credential.uid)));
       }
     } on FirebaseAuthException catch (e) {
       FirebaseAuthException error = FirebaseAuthException(
@@ -92,9 +94,7 @@ class AuthenticationBloc
     AppUserCredential? credential = authenticationRepository.getCurrentUser();
 
     if (credential != null) {
-
-      emit(LoginSuccessState(credential: credential));
-
+      emit(AuthenticatedState(credential: credential));
     }
     emit(AuthenticationInitialState());
   }

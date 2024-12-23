@@ -1,5 +1,6 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
 import 'package:firebase_storage_tuto/feature/user/domain/bloc/user.bloc.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -25,15 +26,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
     return BlocConsumer<AuthenticationBloc, AuthenticationState>(
       builder: (context, authState) {
-        // if (authState is AuthenticationLoadingState) {
-        //   print("AuthenticationLoadingState");
-        //   return const Center(
-        //     child: CircularProgressIndicator(),
-        //   );
-        // }
-
         return BlocBuilder<UserBloc, UserState>(
           builder: (context, userState) {
+            if (kDebugMode) {
+              print(userState);
+            }
             if (userState is UserInitialState) {
               userBloc.add(FetchUserEvent(id: widget.uid));
             }
@@ -84,15 +81,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
           userBloc.add(FetchUserEvent(id: widget.uid));
         }
       },
-      // listener: (BuildContext context, UserState state) {
-      //   if (state is UserInitialState) {
-      //     userBloc.add(FetchUserEvent(id: widget.uid));
-      //   }
-      //
-      //   if (state is UserFetchingFailure) {
-      //     GoRouter.of(context).go("/errorPage");
-      //   }
-      // },
     );
   }
 }

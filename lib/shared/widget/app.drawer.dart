@@ -1,6 +1,6 @@
 import 'package:firebase_storage_tuto/feature/authentication/domain/bloc/authentication_bloc.dart';
-import 'package:firebase_storage_tuto/feature/user/ui/pages/user.profile.page.dart';
 import 'package:firebase_storage_tuto/shared/widget/app.drawer.tile.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -42,18 +42,31 @@ class _AppDrawerState extends State<AppDrawer> {
                 onTap: () => Navigator.of(context).pop(),
               ),
 
-              BlocBuilder<AuthenticationBloc, AuthenticationState>(
-                builder: (context, state) {
+              BlocConsumer<AuthenticationBloc, AuthenticationState>(
+                listener: (context, authState) {
+                  if (authState is AuthenticatedState ) {
+                    GoRouter.of(context)
+                        .go("/user/${authState.credential.uid}");
+                  }
+                },
+                builder: (BuildContext context, AuthenticationState authState) {
                   return AppDrawerTile(
                     title: "P R O F I L E",
                     icon: Icons.person,
                     onTap: () {
                       // pop menu drawer
                       GoRouter.of(context).pop();
-
-                      if (state is LoginSuccessState) {
+                      if (kDebugMode) {
+                        print("_checkUserAuthentication $authState");
+                      }
+                      if (authState is LoginSuccessState) {
                         // navigate to profile page
-                        GoRouter.of(context).go("/user/${state.credential.uid}");
+                        GoRouter.of(context)
+                            .go("/user/${authState.credential.uid}");
+                      } else {
+                        context
+                            .read<AuthenticationBloc>()
+                            .add(const CheckAuthenticationEvent());
                       }
                     },
                   );
